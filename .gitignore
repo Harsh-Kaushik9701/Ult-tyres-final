@@ -10,8 +10,11 @@
 *.tsbuildinfo
 next-env.d.ts
 
-# Large raw marketing assets (>100MB will fail GitHub push; web assets are in /public)
+# Large raw marketing assets, briefs and PDFs (>100MB; all web assets are optimized in /public)
 Images & Videos/
+Website Development/
+*.pdf
+public/brand-options/
 
 # Environment and secrets
 .env
