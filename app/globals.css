@@ -111,12 +111,14 @@ h3 { font-size:30px; }
 .hero-stat:first-child { border-left:3px solid var(--red); }
 .hero-stat strong { display:block; font:800 22px var(--display); color:#fff; }
 .hero-stat span { display:block; color:#9ea5a1; font-size:9px; letter-spacing:.08em; text-transform:uppercase; margin-top:2px; }
-.hero-controls { position:absolute; right:0; bottom:38px; z-index:4; display:flex; align-items:center; gap:8px; }
-.hero-controls button { width:28px; height:4px; padding:0; border:0; background:rgba(255,255,255,.25); cursor:pointer; transition:background .2s, width .2s; }
+.hero-controls { position:absolute; right:200px; bottom:38px; z-index:15; display:flex; align-items:center; gap:8px; }
+.hero-controls button { width:28px; height:4px; padding:0; border:0; background:rgba(255,255,255,.25); cursor:pointer; transition:background .2s, width .2s; border-radius:2px; }
 .hero-controls button[aria-current=true] { background:var(--red); width:40px; }
 .hero-controls button:hover { background:rgba(255,255,255,.5); }
-.hero-progress { width:80px; height:2px; background:rgba(255,255,255,.1); margin-right:8px; overflow:hidden; border-radius:1px; }
-.hero-progress-fill { height:100%; background:var(--red); transition:width .45s ease; }
+.hero-progress { width:90px; height:4px; background:rgba(255,255,255,.2); margin-right:10px; overflow:hidden; border-radius:2px; position:relative; }
+.hero-progress-fill { height:100%; background:var(--red); box-shadow:0 0 10px rgba(224,36,36,.8); width:0%; border-radius:2px; }
+.hero-progress-fill.running { animation:heroProgressFill 5.5s linear forwards; }
+@keyframes heroProgressFill { 0% { width:0%; } 100% { width:100%; } }
 .banner-promo { align-self:center; justify-self:center; width:min(100%,420px); padding:32px; border:1px solid rgba(255,255,255,.2); background:rgba(20,23,23,.6); backdrop-filter:blur(8px); }
 .banner-promo strong { display:block; color:#ff6d63; font:700 12px var(--body); letter-spacing:.16em; text-transform:uppercase; }
 .banner-promo span { display:block; margin:14px 0 21px; font:800 31px/1.02 var(--display); text-transform:uppercase; }
@@ -322,7 +324,7 @@ th { background:#f1f0eb; font-size:9px; text-transform:uppercase; letter-spacing
   .hero-image { height:280px; margin-top:-14px; }
   .hero-image img { width:min(76vw,350px); max-height:280px; }
   .hero-image::before { width:220px; box-shadow:0 0 0 30px rgba(255,255,255,.02),0 0 0 60px rgba(255,255,255,.015); }
-  .hero-controls { right:0; bottom:16px; }
+  .hero-controls { left:20px; right:auto; bottom:18px; }
   .hero-stats { position:relative; bottom:auto; margin:0 0 20px; }
   .hero-stat { padding:10px 14px; }
   .hero-stat strong { font-size:18px; }

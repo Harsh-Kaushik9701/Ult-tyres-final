@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { navItems, services } from "@/lib/content";
 import Image from "next/image";
 
@@ -305,32 +305,124 @@ const banners=[
   {kind:"promo",src:"",eyebrow:"Dealer opportunities",title:<>Local knowledge.<br/><span>National backing.</span></>,text:"Join the Ultimate Tyres network and give your customers a stronger range, responsive support and a partner built around their work.",image:"",alt:"",cta:[{label:"Become a dealer",href:"/dealers/apply"},{label:"Explore our network",href:"/network",outline:true}]},
 ];
 const stats=[{value:"50+",label:"Years of engineering"},{value:"30+",label:"Countries served"},{value:"100%",label:"Australian support"}];
-export function HeroCarousel(){
- const [active,setActive]=useState(0);const [fading,setFading]=useState(false);const slide=banners[active];
- function go(n:number){setFading(true);setTimeout(()=>{setActive(n);setFading(false);},420);}
- /* auto-advance */
- const activeRef={current:active};activeRef.current=active;
- useState(()=>{const id=setInterval(()=>{const next=(activeRef.current+1)%banners.length;go(next);},6200);return ()=>clearInterval(id);});
- return <section className="hero">
-   <div className="hero-bg-wrap">{banners.map((b,i)=><div key={i} className={`hero-bg-layer${i===active?" active":""}`}>{b.kind==="video"?<video autoPlay muted loop playsInline poster={b.image}><source src={b.src} type="video/mp4"/></video>:b.kind==="image"?<Image src={b.src} alt="" fill priority={i===0} sizes="100vw"/>:null}</div>)}</div>
-   <div className="hero-gradient"/>
-   <div className="hero-accent-strip"/>
-   <div className={`container hero-inner${fading?" hero-fade":""}`}>
-     <div className="hero-copy">
-       <div className="hero-slide-no">0{active+1}<span>/ 0{banners.length}</span></div>
-       <div className="eyebrow">{slide.eyebrow}</div>
-       <h1>{slide.title}</h1>
-       <p>{slide.text}</p>
-       <div className="hero-actions">{slide.cta.map((c,i)=><Link key={i} className={`button${(c as any).outline?" button-outline":""}`} href={c.href}>{c.label} {!(c as any).outline&&"↗"}</Link>)}</div>
-     </div>
-     <div className="hero-image">{active===4?<div className="banner-promo"><strong>Dealer opportunities</strong><span>Local knowledge.<br/>National backing.</span><Link className="text-link" href="/network">Explore our network</Link></div>:<Image src={slide.image} alt={slide.alt} width={800} height={800} priority={active===0}/>}</div>
-     <div className="hero-stats">{stats.map((s,i)=><div key={i} className="hero-stat"><strong>{s.value}</strong><span>{s.label}</span></div>)}</div>
-     <div className="hero-controls" role="tablist" aria-label="Homepage banners">
-       <div className="hero-progress"><div className="hero-progress-fill" style={{width:`${((active+1)/banners.length)*100}%`}}/></div>
-       {[0,1,2,3,4].map((n)=><button key={n} role="tab" aria-label={"Show banner "+(n+1)} aria-current={active===n} onClick={()=>go(n)}/>)}
-     </div>
-   </div>
- </section>;
+const SLIDE_DURATION = 5500;
+
+export function HeroCarousel() {
+  const [active, setActive] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
+  const slide = banners[active];
+
+  const go = useCallback((n: number) => {
+    setFading(true);
+    setTimeout(() => {
+      setActive(n);
+      setAnimKey((k) => k + 1);
+      setFading(false);
+    }, 380);
+  }, []);
+
+  /* auto-advance timer */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      go((active + 1) % banners.length);
+    }, SLIDE_DURATION);
+    return () => clearTimeout(timer);
+  }, [active, animKey, go]);
+
+  return (
+    <section className="hero">
+      <div className="hero-bg-wrap">
+        {banners.map((b, i) => (
+          <div key={i} className={`hero-bg-layer${i === active ? " active" : ""}`}>
+            {b.kind === "video" ? (
+              <video autoPlay muted loop playsInline poster={b.image}>
+                <source src={b.src} type="video/mp4" />
+              </video>
+            ) : b.kind === "image" ? (
+              <Image src={b.src} alt="" fill priority={i === 0} sizes="100vw" />
+            ) : null}
+          </div>
+        ))}
+      </div>
+      <div className="hero-gradient" />
+      <div className="hero-accent-strip" />
+      <div className={`container hero-inner${fading ? " hero-fade" : ""}`}>
+        <div className="hero-copy">
+          <div className="hero-slide-no">
+            0{active + 1}
+            <span>/ 0{banners.length}</span>
+          </div>
+          <div className="eyebrow">{slide.eyebrow}</div>
+          <h1>{slide.title}</h1>
+          <p>{slide.text}</p>
+          <div className="hero-actions">
+            {slide.cta.map((c, i) => (
+              <Link
+                key={i}
+                className={`button${(c as any).outline ? " button-outline" : ""}`}
+                href={c.href}
+              >
+                {c.label} {!(c as any).outline && "↗"}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className="hero-image">
+          {active === 4 ? (
+            <div className="banner-promo">
+              <strong>Dealer opportunities</strong>
+              <span>
+                Local knowledge.
+                <br />
+                National backing.
+              </span>
+              <Link className="text-link" href="/network">
+                Explore our network
+              </Link>
+            </div>
+          ) : (
+            <Image
+              src={slide.image}
+              alt={slide.alt}
+              width={800}
+              height={800}
+              priority={active === 0}
+            />
+          )}
+        </div>
+        <div className="hero-stats">
+          {stats.map((s, i) => (
+            <div key={i} className="hero-stat">
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="hero-controls" role="tablist" aria-label="Homepage banners">
+          <div
+            className="hero-progress"
+            role="progressbar"
+            aria-valuenow={active + 1}
+            aria-valuemin={1}
+            aria-valuemax={banners.length}
+            title={`Slide ${active + 1} of ${banners.length}`}
+          >
+            <div key={`progress-${animKey}`} className="hero-progress-fill running" />
+          </div>
+          {banners.map((_, n) => (
+            <button
+              key={n}
+              role="tab"
+              aria-label={"Show banner " + (n + 1)}
+              aria-current={active === n}
+              onClick={() => go(n)}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function ContactBand() {
