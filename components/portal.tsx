@@ -209,7 +209,7 @@ export function DealerProductCatalog({ products }: { products: DealerProduct[] }
         <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>
           Displaying {filtered.length} verified commercial specifications · Rocklea & Regional stock available
         </span>
-        <span style={{ fontSize: 11, background: "#fef3c7", color: "#92400e", padding: "4px 10px", borderRadius: 4, fontWeight: 700 }}>
+        <span style={{ fontSize: 11, background: "var(--yellow)", color: "#000000", padding: "4px 10px", borderRadius: 4, fontWeight: 800 }}>
           ★ Tier 1 Wholesale Rates Active
         </span>
       </div>
@@ -234,8 +234,8 @@ export function DealerProductCatalog({ products }: { products: DealerProduct[] }
                     position: "absolute",
                     top: 10,
                     right: 10,
-                    background: p.brand === "Ralson" ? "#141717" : p.brand === "Blacklion" ? "#e02424" : "#2563eb",
-                    color: "#fff",
+                    background: p.brand === "Ralson" ? "#000000" : p.brand === "Blacklion" ? "var(--yellow)" : "#1a1a1a",
+                    color: p.brand === "Blacklion" ? "#000000" : "#ffffff",
                     fontSize: 10,
                     fontWeight: 800,
                     padding: "3px 8px",
@@ -259,7 +259,7 @@ export function DealerProductCatalog({ products }: { products: DealerProduct[] }
                 <span>Tread Depth <strong>{p.tread_depth_mm ? `${p.tread_depth_mm} mm` : "16.0 mm"}</strong></span>
                 <span>
                   Wholesale Cost{" "}
-                  <strong style={{ color: "var(--red)", fontSize: 15 }}>
+                  <strong style={{ color: "var(--yellow-deep)", fontSize: 15 }}>
                     ${unitPrice.toFixed(2)}
                   </strong>
                 </span>
@@ -273,7 +273,7 @@ export function DealerProductCatalog({ products }: { products: DealerProduct[] }
               <div style={{ background: "#f8faf9", padding: "10px", borderRadius: 6, border: "1px solid var(--line)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 6, fontWeight: 600 }}>
                   <span>Quantity</span>
-                  <span style={{ color: "var(--red)" }}>Subtotal: ${lineTotal.toFixed(2)}</span>
+                  <span style={{ color: "var(--yellow-deep)", fontWeight: 700 }}>Subtotal: ${lineTotal.toFixed(2)}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
@@ -430,7 +430,7 @@ export function RapidOrderForm({ products }: { products: DealerProduct[] }) {
               return (
                 <tr key={p.id} style={{ background: qty > 0 ? "#f0fdf4" : undefined }}>
                   <td>
-                    <span style={{ fontWeight: 700, color: p.brand === "Ralson" ? "#141717" : p.brand === "Blacklion" ? "#e02424" : "#2563eb" }}>
+                    <span style={{ fontWeight: 800, color: p.brand === "Ralson" ? "#000000" : p.brand === "Blacklion" ? "var(--yellow-deep)" : "#333333" }}>
                       {p.brand}
                     </span>
                   </td>
@@ -476,7 +476,9 @@ export function RapidOrderForm({ products }: { products: DealerProduct[] }) {
       <div
         style={{
           marginTop: 20,
-          background: "#141717",
+          background: "#000000",
+          border: "1px solid #242828",
+          borderTop: "3px solid var(--yellow)",
           color: "#fff",
           padding: "16px 24px",
           borderRadius: 8,

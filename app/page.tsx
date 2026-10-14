@@ -80,7 +80,7 @@ export default function HomePage() {
             <div className="brand-card" style={{ display: "flex", flexDirection: "column", padding: 30 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <span className="brand-index">02 / DEEP-TREAD TRACTION</span>
-                <span style={{ fontSize: 11, background: "#e02424", color: "#fff", padding: "3px 8px", borderRadius: 4, fontWeight: 700 }}>
+                <span style={{ fontSize: 11, background: "var(--yellow)", color: "#000", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
                   22.5mm Deep Tread
                 </span>
               </div>
@@ -111,7 +111,7 @@ export default function HomePage() {
             <div className="brand-card" style={{ display: "flex", flexDirection: "column", padding: 30 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <span className="brand-index">03 / GLOBAL SCALE</span>
-                <span style={{ fontSize: 11, background: "#2563eb", color: "#fff", padding: "3px 8px", borderRadius: 4, fontWeight: 700 }}>
+                <span style={{ fontSize: 11, background: "#000000", color: "var(--yellow)", border: "1px solid var(--yellow)", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
                   Proven Endurance
                 </span>
               </div>
@@ -152,7 +152,7 @@ export default function HomePage() {
         <div className="container">
           <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 40, alignItems: "center" }}>
             <div>
-              <div className="eyebrow" style={{ color: "var(--red)" }}>Specialist Fleet Engineering</div>
+              <div className="eyebrow" style={{ color: "var(--yellow)" }}>Specialist Fleet Engineering</div>
               <h2 style={{ fontSize: 38, lineHeight: 1.15, margin: "14px 0" }}>
                 Over 70% of Trucks Run with Misaligned Drive Axles.
               </h2>
@@ -175,10 +175,10 @@ export default function HomePage() {
             </div>
 
             <div style={{ background: "#1c2121", border: "1px solid #333a3a", borderRadius: 12, padding: 32, textAlign: "center" }}>
-              <span style={{ fontSize: 11, color: "var(--red)", fontWeight: 800, textTransform: "uppercase" }}>
+              <span style={{ fontSize: 11, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase" }}>
                 Fleet ROI Benchmark
               </span>
-              <div style={{ fontSize: 44, fontWeight: 900, color: "#4ade80", margin: "10px 0" }}>
+              <div style={{ fontSize: 44, fontWeight: 900, color: "var(--yellow)", margin: "10px 0" }}>
                 $58,000+
               </div>
               <p style={{ fontSize: 13, color: "#9ca3af", margin: "0 0 16px" }}>
@@ -236,7 +236,7 @@ export default function HomePage() {
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <span style={{ fontSize: 11, background: "var(--red)", color: "#fff", padding: "3px 8px", borderRadius: 4, fontWeight: 700 }}>
+                <span style={{ fontSize: 11, background: "var(--yellow)", color: "#000", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
                   B2B DEALER CONSOLE
                 </span>
                 <span style={{ fontSize: 11, color: "#4ade80", fontWeight: 700 }}>● Live Inventory Active</span>
@@ -319,7 +319,7 @@ export default function HomePage() {
       <section className="section section-dark section-tight">
         <div className="container feature-split">
           <div className="feature-copy">
-            <div className="eyebrow" style={{ color: "var(--red)" }}>Strategic Australian Network</div>
+            <div className="eyebrow" style={{ color: "var(--yellow)" }}>Strategic Australian Network</div>
             <h2>Australia, in Motion.<br />Closer to Your Route.</h2>
             <p style={{ color: "#d1d5db" }}>
               Explore our interactive dealer and service network across Queensland, New South Wales, Victoria, South Australia, and Western Australia. Connect directly with heavy alignment bays and mobile fitting units.

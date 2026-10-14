@@ -38,7 +38,7 @@ export default function WheelAlignmentPage() {
       {/* Hero Section */}
       <section className="page-hero" style={{ background: "linear-gradient(135deg, #141717 0%, #1e2424 100%)", color: "#fff", position: "relative" }}>
         <div className="container">
-          <div className="eyebrow" style={{ color: "var(--red)" }}>Specialist Heavy Vehicle Fleet Service</div>
+          <div className="eyebrow" style={{ color: "var(--yellow)" }}>Specialist Heavy Vehicle Fleet Service</div>
           <h1 style={{ fontSize: 46, maxWidth: 860, lineHeight: 1.15, margin: "16px 0" }}>
             Total Heavy Truck & Fleet Wheel Alignment Services
           </h1>
@@ -162,7 +162,7 @@ export default function WheelAlignmentPage() {
       <section className="section section-dark">
         <div className="container">
           <div style={{ maxWidth: 780, margin: "0 auto 40px", textAlign: "center" }}>
-            <div className="eyebrow" style={{ color: "var(--red)" }}>Interactive Fleet Calculator</div>
+            <div className="eyebrow" style={{ color: "var(--yellow)" }}>Interactive Fleet Calculator</div>
             <h2 style={{ fontSize: 36, margin: "12px 0" }}>Calculate Your Fleet's Annual Alignment Savings</h2>
             <p style={{ color: "#9ca3af", fontSize: 14 }}>
               Adjust the sliders below to your fleet's actual size and duty cycle. See how much diesel and tyre expenditure you recover every single year.
@@ -175,7 +175,7 @@ export default function WheelAlignmentPage() {
               <div style={{ marginBottom: 22 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                   <label style={{ fontSize: 13, fontWeight: 700, color: "#e5e7eb" }}>Number of Commercial Vehicles in Fleet</label>
-                  <strong style={{ color: "var(--red)", fontSize: 16 }}>{truckCount} Prime Movers</strong>
+                  <strong style={{ color: "var(--yellow)", fontSize: 16 }}>{truckCount} Prime Movers</strong>
                 </div>
                 <input
                   type="range"
@@ -183,7 +183,7 @@ export default function WheelAlignmentPage() {
                   max="100"
                   value={truckCount}
                   onChange={(e) => setTruckCount(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--red)" }}
+                  style={{ width: "100%", accentColor: "var(--yellow)" }}
                 />
               </div>
 
@@ -199,7 +199,7 @@ export default function WheelAlignmentPage() {
                   step="5000"
                   value={kmPerYear}
                   onChange={(e) => setKmPerYear(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--red)" }}
+                  style={{ width: "100%", accentColor: "var(--yellow)" }}
                 />
               </div>
 
@@ -215,7 +215,7 @@ export default function WheelAlignmentPage() {
                   step="1"
                   value={fuelEconomy}
                   onChange={(e) => setFuelEconomy(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--red)" }}
+                  style={{ width: "100%", accentColor: "var(--yellow)" }}
                 />
               </div>
 
@@ -231,14 +231,14 @@ export default function WheelAlignmentPage() {
                   step="0.05"
                   value={dieselPrice}
                   onChange={(e) => setDieselPrice(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--red)" }}
+                  style={{ width: "100%", accentColor: "var(--yellow)" }}
                 />
               </div>
             </div>
 
             {/* Results Display */}
-            <div style={{ background: "linear-gradient(145deg, #181c1c, #0d0f0f)", padding: 36, borderRadius: 10, border: "2px solid var(--red)" }}>
-              <span style={{ fontSize: 11, color: "var(--red)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
+            <div style={{ background: "linear-gradient(145deg, #181c1c, #0d0f0f)", padding: 36, borderRadius: 10, border: "2px solid var(--yellow)" }}>
+              <span style={{ fontSize: 11, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
                 Estimated Annual Savings
               </span>
               <div style={{ fontSize: 52, fontWeight: 900, color: "#fff", margin: "12px 0 20px", fontFamily: "var(--display)", letterSpacing: ".02em" }}>
@@ -255,7 +255,7 @@ export default function WheelAlignmentPage() {
                 </div>
                 <div>
                   <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Extended Casing & Tread Life</span>
-                  <strong style={{ fontSize: 22, color: "#60a5fa" }}>
+                  <strong style={{ fontSize: 22, color: "var(--yellow)" }}>
                     +${Math.round(calculations.tyreSavings).toLocaleString("en-AU")}
                   </strong>
                 </div>

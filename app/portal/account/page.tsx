@@ -66,7 +66,7 @@ export default async function PortalAccount() {
         <div className="portal-card">
           <h3 style={{ marginTop: 0, marginBottom: 16 }}>Commercial Terms & Support</h3>
           <div className="product-specs">
-            <span>Wholesale Price Tier <strong style={{ color: "var(--red)" }}>{dealer.accountTier}</strong></span>
+            <span>Wholesale Price Tier <strong style={{ color: "var(--yellow-deep)" }}>{dealer.accountTier}</strong></span>
             <span>Credit Settlement <strong style={{ color: "#166534" }}>{dealer.paymentTerms}</strong></span>
             <span>Direct Account Manager <strong>{dealer.accountManager}</strong></span>
             <span>Dispatch Depot <strong>Rocklea National Distribution Center</strong></span>

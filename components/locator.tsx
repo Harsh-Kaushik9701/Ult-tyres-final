@@ -71,7 +71,7 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div>
-            <span style={{ fontSize: 10, color: "var(--red)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
+            <span style={{ fontSize: 10, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
               Live Distribution Network
             </span>
             <strong style={{ display: "block", color: "#fff", fontSize: 16 }}>Australia National Backbone</strong>
@@ -123,16 +123,16 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                 style={{ cursor: "pointer" }}
               >
                 {isSelected && (
-                  <circle r="18" fill="rgba(224, 36, 36, 0.25)">
+                  <circle r="18" fill="rgba(255, 199, 0, 0.35)">
                     <animate attributeName="r" values="10;22;10" dur="2s" repeatCount="indefinite" />
                     <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
                   </circle>
                 )}
                 <circle
                   r={isSelected ? 9 : 6}
-                  fill={isSelected ? "#e02424" : "#facc15"}
-                  stroke="#ffffff"
-                  strokeWidth={isSelected ? 3 : 1.5}
+                  fill={isSelected ? "var(--yellow)" : "#d4a800"}
+                  stroke="#000000"
+                  strokeWidth={isSelected ? 2.5 : 1.5}
                 />
                 <text
                   y="-14"
@@ -163,7 +163,7 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
               <div>
-                <span style={{ fontSize: 10, color: "var(--red)", fontWeight: 800, textTransform: "uppercase" }}>
+                <span style={{ fontSize: 10, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase" }}>
                   Selected Depot · {selectedLocation.state}
                 </span>
                 <strong style={{ fontSize: 16, display: "block", margin: "2px 0 4px" }}>
@@ -263,8 +263,8 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                 onClick={() => setSelectedId(l.id)}
                 style={{
                   cursor: "pointer",
-                  border: isCurrent ? "2px solid var(--red)" : "1px solid var(--line)",
-                  background: isCurrent ? "#fef2f2" : "#fff",
+                  border: isCurrent ? "2px solid var(--yellow)" : "1px solid var(--line)",
+                  background: isCurrent ? "#fffde6" : "#fff",
                   transition: "all 0.2s ease"
                 }}
               >
@@ -274,8 +274,8 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                     style={{
                       fontSize: 11,
                       fontWeight: 800,
-                      color: isCurrent ? "var(--red)" : "var(--muted)",
-                      background: isCurrent ? "#fee2e2" : "#f3f4f6",
+                      color: isCurrent ? "#000" : "var(--muted)",
+                      background: isCurrent ? "var(--yellow)" : "#f3f4f6",
                       padding: "2px 8px",
                       borderRadius: 4
                     }}
@@ -302,7 +302,7 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                     href={`https://maps.google.com/?q=${encodeURIComponent(l.name + " " + l.address + " " + l.suburb)}`}
                     target="_blank"
                     rel="noreferrer"
-                    style={{ fontSize: 12, color: "var(--red)" }}
+                    style={{ fontSize: 12, color: "var(--yellow-deep)" }}
                   >
                     Directions ↗
                   </a>

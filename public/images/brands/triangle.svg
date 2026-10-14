@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
-  <rect width="240" height="60" rx="8" fill="#141717"/>
+  <rect width="240" height="60" rx="8" fill="#000000" stroke="#1a1a1a" stroke-width="1"/>
   <!-- Stylized Triangle Icon -->
   <g transform="translate(14, 12)">
-    <polygon points="18,4 32,32 4,32" fill="none" stroke="#e02424" stroke-width="4" stroke-linejoin="round"/>
+    <polygon points="18,4 32,32 4,32" fill="none" stroke="#ffc700" stroke-width="4" stroke-linejoin="round"/>
     <polygon points="18,12 26,27 10,27" fill="#ffffff"/>
   </g>
   <text x="56" y="31" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="20" fill="#ffffff" letter-spacing="2.5">TRIANGLE</text>
-  <text x="57" y="44" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="8.5" fill="#facc15" letter-spacing="3.5">RADIAL FLEET TYRES</text>
+  <text x="57" y="44" font-family="'Inter', -apple-system, sans-serif" font-weight="700" font-size="8.5" fill="#ffc700" letter-spacing="3.5">RADIAL FLEET TYRES</text>
 </svg>

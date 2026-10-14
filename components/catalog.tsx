@@ -127,7 +127,7 @@ export function LoginForm() {
       </div>
       <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--line)", fontSize: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span>Not yet an approved dealer?</span>
-        <Link href="/dealers/apply" style={{ color: "var(--red)", fontWeight: 700 }}>
+        <Link href="/dealers/apply" style={{ color: "var(--yellow-deep)", fontWeight: 700 }}>
           Register for new account ↗
         </Link>
       </div>

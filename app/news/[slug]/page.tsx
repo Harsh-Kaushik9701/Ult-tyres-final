@@ -109,7 +109,7 @@ export default async function NewsArticle({
                 .slice(0, 4)
                 .map((a) => (
                   <div key={a.slug} style={{ borderBottom: "1px solid var(--line)", paddingBottom: 12 }}>
-                    <span style={{ fontSize: 10, color: "var(--red)", fontWeight: 800, textTransform: "uppercase" }}>
+                    <span style={{ fontSize: 10, color: "var(--yellow-deep)", fontWeight: 800, textTransform: "uppercase" }}>
                       {a.category}
                     </span>
                     <h4 style={{ fontSize: 14, margin: "4px 0" }}>

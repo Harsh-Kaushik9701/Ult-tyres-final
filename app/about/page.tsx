@@ -59,7 +59,7 @@ export default function AboutPage() {
       <section className="section section-dark">
         <div className="container">
           <div style={{ maxWidth: 760, margin: "0 auto 40px", textAlign: "center" }}>
-            <div className="eyebrow" style={{ color: "var(--red)" }}>Brand Archetype & Promise</div>
+            <div className="eyebrow" style={{ color: "var(--yellow)" }}>Brand Archetype & Promise</div>
             <h2 style={{ fontSize: 38, margin: "12px 0" }}>The Dependable Co-Pilot</h2>
             <p style={{ color: "#9ca3af", fontSize: 14 }}>
               Australian B2B communication needs to be straight-talking, benefit-driven, and devoid of corporate jargon. We focus on the "holes" (uptime, fuel savings, and profitability), not just the "drill" (the tyre).
@@ -121,7 +121,7 @@ export default function AboutPage() {
               <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6 }}>
                 Full drive-through heavy alignment rigs accommodating prime movers, semi-trailers, and multi-combination B-doubles. Calibrated optical laser sensors square tandem drive axles within 0.01 degrees.
               </p>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--red)" }}>✓ Eliminates 70% Dog-Tracking</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--yellow-deep)" }}>✓ Eliminates 70% Dog-Tracking</span>
             </div>
 
             <div style={{ background: "#f8faf9", border: "1px solid var(--line)", borderRadius: 8, padding: 28 }}>
@@ -149,7 +149,7 @@ export default function AboutPage() {
       <section className="section section-tight" style={{ background: "#141717", color: "#fff" }}>
         <div className="container feature-split">
           <div className="feature-copy">
-            <div className="eyebrow" style={{ color: "var(--red)" }}>Real People. Real Know-How.</div>
+            <div className="eyebrow" style={{ color: "var(--yellow)" }}>Real People. Real Know-How.</div>
             <h2 style={{ color: "#fff" }}>Ready to partner with a team that knows the road?</h2>
             <p style={{ color: "#9ca3af" }}>
               Call our Rocklea headquarters or connect directly with our technical fleet specialists. We are on standby for you right now.
