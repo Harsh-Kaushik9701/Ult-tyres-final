@@ -6,6 +6,9 @@ import bcrypt from "bcryptjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
+try { process.loadEnvFile(path.join(root, ".env.local")); } catch {}
+try { process.loadEnvFile(path.join(root, ".env")); } catch {}
+
 const uri = process.env.MONGODB_URI || process.env.MONGODB_URL;
 if (!uri) {
   console.error("Error: Set MONGODB_URI before running db:setup.");
