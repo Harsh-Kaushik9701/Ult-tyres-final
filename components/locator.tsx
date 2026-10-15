@@ -304,7 +304,7 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                     rel="noreferrer"
                     style={{ fontSize: 12, color: "var(--yellow-deep)" }}
                   >
-                    Directions ↗
+                    Directions
                   </a>
                 </div>
               </article>

@@ -285,6 +285,7 @@ export default function HomePage() {
             eyebrow="Fleet Engineering Knowledge"
             title="Educational Authority from the Field."
             text="Ideas and technical guidance for fleet directors, workshop managers, and commercial operators."
+            dark
           />
           <div className="article-grid">
             {articles.slice(0, 3).map((a) => (
@@ -295,14 +296,14 @@ export default function HomePage() {
                 <h3>{a.title}</h3>
                 <p>{a.excerpt}</p>
                 <Link className="text-link" href={`/news/${a.slug}`}>
-                  Read technical article ↗
+                  Read technical article
                 </Link>
               </article>
             ))}
           </div>
           <div style={{ marginTop: 28 }}>
             <Link className="text-link" href="/news">
-              Explore all fleet insights & technical blogs ↗
+              Explore all fleet insights & technical blogs
             </Link>
           </div>
         </div>

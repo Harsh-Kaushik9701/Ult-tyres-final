@@ -281,7 +281,7 @@ export function Footer() {
                 target="_blank"
                 rel="noreferrer"
               >
-                Chat on WhatsApp with Fleet Support ↗
+                Chat on WhatsApp with Fleet Support
               </a>
             </div>
           </div>
@@ -369,7 +369,7 @@ export function PageHero({ eyebrow, title, intro, crumb }: { eyebrow:string; tit
 }
 
 export function SectionTitle({ eyebrow, title, text, dark=false }: { eyebrow:string; title:string; text?:string; dark?:boolean }) {
-  return <div className="section-head"><div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2></div>{text&&<p>{text}</p>}</div>;
+  return <div className={`section-head ${dark ? "section-head-dark" : ""}`}><div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2></div>{text&&<p>{text}</p>}</div>;
 }
 
 const banners = [

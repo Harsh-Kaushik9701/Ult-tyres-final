@@ -347,7 +347,7 @@ export default function WheelAlignmentPage() {
             </ul>
             <div style={{ marginTop: 16 }}>
               <Link className="text-link" href="/network">
-                Find nearest alignment location ↗
+                Find nearest alignment location
               </Link>
             </div>
           </aside>

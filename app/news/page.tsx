@@ -66,7 +66,7 @@ export default function NewsPage() {
 
                 <div style={{ paddingTop: 14, borderTop: "1px solid var(--line)" }}>
                   <Link className="text-link" href={`/news/${a.slug}`}>
-                    Read full article ↗
+                    Read full article
                   </Link>
                 </div>
               </article>
