@@ -45,7 +45,7 @@ export default async function PortalAccount() {
         Review your authorised company details, assigned price tiers, delivery addresses, and commercial credit arrangements.
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <div className="account-info-grid">
         <div className="portal-card">
           <h3 style={{ marginTop: 0, marginBottom: 16 }}>Company Information</h3>
           <div className="product-specs">

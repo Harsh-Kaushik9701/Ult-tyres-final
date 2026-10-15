@@ -386,7 +386,7 @@ export function RapidOrderForm({ products }: { products: DealerProduct[] }) {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15, marginBottom: 20 }}>
+      <div className="form-grid" style={{ marginBottom: 20 }}>
         <div className="form-field">
           <label htmlFor="rapid-po">Purchase Order (PO) Number</label>
           <input

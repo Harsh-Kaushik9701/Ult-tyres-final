@@ -71,8 +71,8 @@ export default function WheelAlignmentPage() {
           </div>
 
           {/* Technical Diagram Card */}
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 12, padding: 36, boxShadow: "0 10px 30px rgba(0,0,0,0.04)" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
+          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 12, padding: "clamp(18px, 4vw, 36px)", boxShadow: "0 10px 30px rgba(0,0,0,0.04)" }}>
+            <div className="alignment-diagram-grid">
               {/* Left Column: Visual Axle Alignment SVG */}
               <div>
                 <div style={{ background: "#141717", borderRadius: 8, padding: "28px 20px", textAlign: "center" }}>
@@ -169,9 +169,9 @@ export default function WheelAlignmentPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 36, alignItems: "center" }}>
+          <div className="alignment-calc-grid">
             {/* Controls */}
-            <div style={{ background: "#1c2020", padding: 32, borderRadius: 10, border: "1px solid #2d3333" }}>
+            <div style={{ background: "#1c2020", padding: "clamp(18px, 4vw, 32px)", borderRadius: 10, border: "1px solid #2d3333" }}>
               <div style={{ marginBottom: 22 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                   <label style={{ fontSize: 13, fontWeight: 700, color: "#e5e7eb" }}>Number of Commercial Vehicles in Fleet</label>
@@ -237,16 +237,16 @@ export default function WheelAlignmentPage() {
             </div>
 
             {/* Results Display */}
-            <div style={{ background: "linear-gradient(145deg, #181c1c, #0d0f0f)", padding: 36, borderRadius: 10, border: "2px solid var(--yellow)" }}>
+            <div style={{ background: "linear-gradient(145deg, #181c1c, #0d0f0f)", padding: "clamp(18px, 4vw, 36px)", borderRadius: 10, border: "2px solid var(--yellow)" }}>
               <span style={{ fontSize: 11, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
                 Estimated Annual Savings
               </span>
-              <div style={{ fontSize: 52, fontWeight: 900, color: "#fff", margin: "12px 0 20px", fontFamily: "var(--display)", letterSpacing: ".02em" }}>
+              <div style={{ fontSize: "clamp(34px, 8vw, 52px)", fontWeight: 900, color: "#fff", margin: "12px 0 20px", fontFamily: "var(--display)", letterSpacing: ".02em" }}>
                 ${Math.round(calculations.totalSavings).toLocaleString("en-AU")}
                 <span style={{ fontSize: 18, color: "#9ca3af", fontWeight: 400 }}> / year</span>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24, paddingTop: 16, borderTop: "1px solid #2d3333" }}>
+              <div className="alignment-stats-grid">
                 <div>
                   <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Annual Fuel Cost Reduction (5.5%)</span>
                   <strong style={{ fontSize: 22, color: "#4ade80" }}>

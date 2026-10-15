@@ -20,7 +20,7 @@ export default function NewsPage() {
 
       <section className="section">
         <div className="container">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 28 }}>
+          <div className="article-grid" style={{ gap: 28 }}>
             {articles.map((a, i) => (
               <article
                 className="article-card"

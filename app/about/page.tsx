@@ -105,7 +105,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24 }}>
             <div style={{ background: "#f8faf9", border: "1px solid var(--line)", borderRadius: 8, padding: 28 }}>
               <div style={{ fontSize: 28, marginBottom: 10 }}>🏭</div>
               <h3 style={{ fontSize: 20, margin: "0 0 10px" }}>Rocklea Flagship Distribution Depot</h3>

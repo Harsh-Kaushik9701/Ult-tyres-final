@@ -37,14 +37,7 @@ export default function HomePage() {
             text="Explore the industry's premier commercial radials distributed by Ultimate Tyres across Australia. Built for linehaul prime movers, regional distribution, municipal bus fleets, and quarry tippers."
           />
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: 26,
-              marginTop: 30
-            }}
-          >
+          <div className="brand-grid" style={{ marginTop: 30 }}>
             {/* Ralson Card */}
             <div className="brand-card" style={{ display: "flex", flexDirection: "column", padding: 30 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -150,10 +143,10 @@ export default function HomePage() {
       {/* Specialist Wheel Alignment Callout (Image 4 Requirement) */}
       <section className="section" style={{ background: "linear-gradient(135deg, #141717 0%, #1c2222 100%)", color: "#fff" }}>
         <div className="container">
-          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 40, alignItems: "center" }}>
+          <div className="alignment-highlight-grid">
             <div>
               <div className="eyebrow" style={{ color: "var(--yellow)" }}>Specialist Fleet Engineering</div>
-              <h2 style={{ fontSize: 38, lineHeight: 1.15, margin: "14px 0" }}>
+              <h2 style={{ fontSize: "clamp(24px, 5.5vw, 38px)", lineHeight: 1.15, margin: "14px 0" }}>
                 Over 70% of Trucks Run with Misaligned Drive Axles.
               </h2>
               <p style={{ fontSize: 15, color: "#d1d5db", lineHeight: 1.6, maxWidth: 620 }}>
@@ -164,7 +157,7 @@ export default function HomePage() {
                 <li>Cut commercial fleet fuel consumption by 5% to 8%</li>
                 <li>Extend steer and drive tyre casing life by up to 30%</li>
               </ul>
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 24 }}>
+              <div className="hero-actions" style={{ marginTop: 24 }}>
                 <Link className="button" href="/services/wheel-alignment">
                   Interactive Fuel Savings Calculator ↗
                 </Link>
@@ -174,11 +167,11 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div style={{ background: "#1c2121", border: "1px solid #333a3a", borderRadius: 12, padding: 32, textAlign: "center" }}>
+            <div style={{ background: "#1c2121", border: "1px solid #333a3a", borderRadius: 12, padding: "clamp(20px, 4vw, 32px)", textAlign: "center" }}>
               <span style={{ fontSize: 11, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase" }}>
                 Fleet ROI Benchmark
               </span>
-              <div style={{ fontSize: 44, fontWeight: 900, color: "var(--yellow)", margin: "10px 0" }}>
+              <div style={{ fontSize: "clamp(34px, 8vw, 44px)", fontWeight: 900, color: "var(--yellow)", margin: "10px 0" }}>
                 $58,000+
               </div>
               <p style={{ fontSize: 13, color: "#9ca3af", margin: "0 0 16px" }}>
@@ -273,7 +266,7 @@ export default function HomePage() {
               <li>Rapid SKU bulk ordering grid with PO tagging and instant dispatch confirmation</li>
               <li>Consolidated order history and account invoice management</li>
             </ul>
-            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+            <div className="hero-actions" style={{ marginTop: 24 }}>
               <Link className="button button-dark" href="/dealers/login">
                 Dealer Login (Test Demo Access) ↗
               </Link>
