@@ -18,6 +18,71 @@ export type NetworkLocation = {
   capabilities?: string[];
 };
 
+interface PinCoord {
+  x: number;
+  y: number;
+  labelAnchor: "start" | "middle" | "end";
+  labelDx: number;
+  labelDy: number;
+}
+
+// Hand-calibrated coordinates and smart label offsets for Australia SVG map (600x440)
+const PIN_COORDINATES: Record<string, PinCoord> = {
+  // Western Australia
+  kewdale: { x: 108, y: 272, labelAnchor: "end", labelDx: -10, labelDy: 4 },
+  "loc-kewdale": { x: 108, y: 272, labelAnchor: "end", labelDx: -10, labelDy: 4 },
+
+  // South Australia
+  wingfield: { x: 298, y: 304, labelAnchor: "end", labelDx: -10, labelDy: 4 },
+  "loc-wingfield": { x: 298, y: 304, labelAnchor: "end", labelDx: -10, labelDy: 4 },
+
+  // Victoria (Melbourne Metro distinct separation)
+  laverton: { x: 342, y: 334, labelAnchor: "end", labelDx: -8, labelDy: 14 },
+  "loc-laverton": { x: 342, y: 334, labelAnchor: "end", labelDx: -8, labelDy: 14 },
+  dandenong: { x: 366, y: 342, labelAnchor: "start", labelDx: 8, labelDy: 14 },
+  "loc-dandenong": { x: 366, y: 342, labelAnchor: "start", labelDx: 8, labelDy: 14 },
+
+  // New South Wales (Sydney Metro & Newcastle distinct separation)
+  "eastern-creek": { x: 404, y: 276, labelAnchor: "end", labelDx: -10, labelDy: 2 },
+  "loc-easterncreek": { x: 404, y: 276, labelAnchor: "end", labelDx: -10, labelDy: 2 },
+  botany: { x: 422, y: 284, labelAnchor: "start", labelDx: 10, labelDy: 4 },
+  "loc-botany": { x: 422, y: 284, labelAnchor: "start", labelDx: 10, labelDy: 4 },
+  newcastle: { x: 428, y: 254, labelAnchor: "start", labelDx: 10, labelDy: 2 },
+  "loc-newcastle": { x: 428, y: 254, labelAnchor: "start", labelDx: 10, labelDy: 2 },
+
+  // Queensland (Brisbane North, Central, South-East & Townsville distinct separation)
+  "bald-hills": { x: 440, y: 196, labelAnchor: "start", labelDx: 10, labelDy: -2 },
+  "loc-baldhills": { x: 440, y: 196, labelAnchor: "start", labelDx: 10, labelDy: -2 },
+  rocklea: { x: 436, y: 212, labelAnchor: "end", labelDx: -10, labelDy: 4 },
+  "loc-rocklea": { x: 436, y: 212, labelAnchor: "end", labelDx: -10, labelDy: 4 },
+  yatala: { x: 448, y: 228, labelAnchor: "start", labelDx: 10, labelDy: 8 },
+  "loc-yatala": { x: 448, y: 228, labelAnchor: "start", labelDx: 10, labelDy: 8 },
+  townsville: { x: 424, y: 122, labelAnchor: "start", labelDx: 10, labelDy: 4 },
+  "loc-townsville": { x: 424, y: 122, labelAnchor: "start", labelDx: 10, labelDy: 4 }
+};
+
+function getLocationCoordinates(loc: NetworkLocation): PinCoord {
+  const idKey = (loc.id || "").toLowerCase();
+  const suburbKey = (loc.suburb || "").toLowerCase().replace(/[^a-z]/g, "");
+
+  if (PIN_COORDINATES[idKey]) return PIN_COORDINATES[idKey];
+  for (const [key, coord] of Object.entries(PIN_COORDINATES)) {
+    const cleanKey = key.replace("loc-", "").replace(/[^a-z]/g, "");
+    if (idKey.includes(cleanKey) || suburbKey.includes(cleanKey) || cleanKey.includes(suburbKey)) {
+      return coord;
+    }
+  }
+
+  // Robust calibrated projection fallback for Australia SVG (600x440)
+  if (loc.latitude !== null && loc.longitude !== null) {
+    const x = Math.round(((loc.longitude - 113) / (154 - 113)) * 355 + 95);
+    const y = Math.round(((-loc.latitude - 10) / (40 - 10)) * 305 + 50);
+    return { x, y, labelAnchor: "start", labelDx: 10, labelDy: 4 };
+  }
+
+  return { x: 300, y: 220, labelAnchor: "middle", labelDx: 0, labelDy: -12 };
+}
+
 export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) {
   const [query, setQuery] = useState("");
   const [selectedState, setSelectedState] = useState("all");
@@ -43,16 +108,6 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
     return locations.find((l) => l.id === selectedId) || filtered[0] || locations[0];
   }, [locations, selectedId, filtered]);
 
-  // Convert lat/long to SVG canvas coordinates (600 x 440)
-  function getCoordinates(lat: number, lng: number) {
-    // Australia bounding box approx:
-    // Longitude: 112 to 154 -> width ~42 deg
-    // Latitude: -10 to -44 -> height ~34 deg
-    const x = ((lng - 112) / 42) * 500 + 50;
-    const y = ((lat - (-10)) / (-34)) * 340 + 50;
-    return { x: Math.round(x), y: Math.round(y) };
-  }
-
   return (
     <div className="locator-layout" style={{ gap: 30 }}>
       {/* Interactive Map Visual Panel */}
@@ -71,7 +126,7 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div>
-            <span style={{ fontSize: 10, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
+            <span style={{ fontSize: 10, color: "var(--red)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
               Live Distribution Network
             </span>
             <strong style={{ display: "block", color: "#fff", fontSize: 16 }}>Australia National Backbone</strong>
@@ -98,49 +153,53 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
           />
 
           {/* Interstate Freight Corridor lines */}
-          <g stroke="#374151" strokeWidth="1" strokeDasharray="3 3">
-            <line x1="435" y1="210" x2="410" y2="280" /> {/* Brisbane to Sydney */}
-            <line x1="410" y1="280" x2="350" y2="330" /> {/* Sydney to Melbourne */}
-            <line x1="350" y1="330" x2="300" y2="300" /> {/* Melbourne to Adelaide */}
-            <line x1="300" y1="300" x2="110" y2="270" /> {/* Adelaide to Perth */}
-            <line x1="435" y1="210" x2="425" y2="120" /> {/* Brisbane to Townsville */}
+          <g stroke="#3b4444" strokeWidth="1.2" strokeDasharray="3 3">
+            <line x1="436" y1="212" x2="404" y2="276" /> {/* Brisbane (Rocklea) to Sydney (Eastern Creek) */}
+            <line x1="404" y1="276" x2="342" y2="334" /> {/* Sydney to Melbourne (Laverton) */}
+            <line x1="342" y1="334" x2="298" y2="304" /> {/* Melbourne to Adelaide (Wingfield) */}
+            <line x1="298" y1="304" x2="108" y2="272" /> {/* Adelaide to Perth (Kewdale) */}
+            <line x1="436" y1="212" x2="424" y2="122" /> {/* Brisbane to Townsville */}
+            <line x1="404" y1="276" x2="428" y2="254" /> {/* Sydney to Newcastle */}
           </g>
 
-          <text x="290" y="210" textAnchor="middle" fill="#3f4a4a" fontSize="22" fontWeight="900" letterSpacing="6">
+          <text x="280" y="210" textAnchor="middle" fill="#323a3a" fontSize="22" fontWeight="900" letterSpacing="6">
             AUSTRALIA
           </text>
 
           {/* Location Markers */}
           {locations.map((loc) => {
-            if (loc.latitude === null || loc.longitude === null) return null;
-            const { x, y } = getCoordinates(loc.latitude, loc.longitude);
+            const coord = getLocationCoordinates(loc);
             const isSelected = selectedLocation?.id === loc.id;
+            const isFilteredMatch = filtered.some((f) => f.id === loc.id);
+
             return (
               <g
                 key={loc.id}
-                transform={`translate(${x}, ${y})`}
+                transform={`translate(${coord.x}, ${coord.y})`}
                 onClick={() => setSelectedId(loc.id)}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", opacity: isFilteredMatch ? 1 : 0.28, transition: "opacity 0.25s ease" }}
               >
                 {isSelected && (
-                  <circle r="18" fill="rgba(255, 199, 0, 0.35)">
-                    <animate attributeName="r" values="10;22;10" dur="2s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+                  <circle r="18" fill="rgba(215, 45, 36, 0.35)">
+                    <animate attributeName="r" values="8;20;8" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2s" repeatCount="indefinite" />
                   </circle>
                 )}
                 <circle
-                  r={isSelected ? 9 : 6}
-                  fill={isSelected ? "var(--yellow)" : "#d4a800"}
+                  r={isSelected ? 8 : 5}
+                  fill={isSelected ? "var(--red)" : "#ffffff"}
                   stroke="#000000"
                   strokeWidth={isSelected ? 2.5 : 1.5}
                 />
                 <text
-                  y="-14"
-                  textAnchor="middle"
-                  fill={isSelected ? "#ffffff" : "#9ca3af"}
-                  fontSize={isSelected ? "11" : "9"}
+                  x={coord.labelDx}
+                  y={coord.labelDy}
+                  textAnchor={coord.labelAnchor}
+                  fill={isSelected ? "#ffffff" : isFilteredMatch ? "#e2e8f0" : "#64748b"}
+                  fontSize={isSelected ? "11" : "9.5"}
                   fontWeight={isSelected ? "800" : "600"}
-                  style={{ textShadow: "0 2px 4px rgba(0,0,0,0.8)" }}
+                  letterSpacing="0.02em"
+                  style={{ textShadow: "0 2px 5px rgba(0,0,0,0.95)" }}
                 >
                   {loc.suburb}
                 </text>
@@ -163,7 +222,7 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
               <div>
-                <span style={{ fontSize: 10, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase" }}>
+                <span style={{ fontSize: 10, color: "var(--red)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Selected Depot · {selectedLocation.state}
                 </span>
                 <strong style={{ fontSize: 16, display: "block", margin: "2px 0 4px" }}>
@@ -237,9 +296,9 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                   style={{
                     padding: "6px 14px",
                     fontSize: 11,
-                    color: isActive ? "#fff" : "var(--ink)",
-                    borderColor: isActive ? "transparent" : "var(--line)",
-                    background: isActive ? "var(--ink)" : "#fff"
+                    color: isActive ? "#ffffff" : "var(--ink)",
+                    borderColor: isActive ? "var(--red)" : "var(--line)",
+                    background: isActive ? "var(--red)" : "#ffffff"
                   }}
                 >
                   {st === "all" ? "All Australia" : st}
@@ -263,8 +322,9 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                 onClick={() => setSelectedId(l.id)}
                 style={{
                   cursor: "pointer",
-                  border: isCurrent ? "2px solid var(--yellow)" : "1px solid var(--line)",
-                  background: isCurrent ? "#fffde6" : "#fff",
+                  border: isCurrent ? "2px solid var(--red)" : "1px solid var(--line)",
+                  background: isCurrent ? "#fff8f7" : "#ffffff",
+                  boxShadow: isCurrent ? "0 4px 18px rgba(215, 45, 36, 0.12)" : "none",
                   transition: "all 0.2s ease"
                 }}
               >
@@ -274,8 +334,8 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                     style={{
                       fontSize: 11,
                       fontWeight: 800,
-                      color: isCurrent ? "#000" : "var(--muted)",
-                      background: isCurrent ? "var(--yellow)" : "#f3f4f6",
+                      color: isCurrent ? "#ffffff" : "var(--muted)",
+                      background: isCurrent ? "var(--red)" : "#f3f4f6",
                       padding: "2px 8px",
                       borderRadius: 4
                     }}
@@ -302,7 +362,7 @@ export function NetworkLocator({ locations }: { locations: NetworkLocation[] }) 
                     href={`https://maps.google.com/?q=${encodeURIComponent(l.name + " " + l.address + " " + l.suburb)}`}
                     target="_blank"
                     rel="noreferrer"
-                    style={{ fontSize: 12, color: "var(--yellow-deep)" }}
+                    style={{ fontSize: 12, color: "var(--red)" }}
                   >
                     Directions
                   </a>

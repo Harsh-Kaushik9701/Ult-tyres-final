@@ -20,8 +20,8 @@ export default async function NetworkPage() {
       const db = await getDb();
       const docs = await db.collection("locations").find({ active: { $ne: false } }).sort({ state: 1, suburb: 1 }).toArray();
       if (docs && docs.length > 0) {
-        locations = docs.map((d: any) => ({
-          id: String(d._id || d.id),
+        const dbLocations: NetworkLocation[] = docs.map((d: any) => ({
+          id: String(d.id || d._id),
           name: d.name,
           address: d.address,
           suburb: d.suburb,
@@ -34,6 +34,12 @@ export default async function NetworkPage() {
           hours: d.hours,
           capabilities: d.capabilities
         }));
+        // Ensure all national master locations are included if not present in DB
+        const dbSuburbs = new Set(dbLocations.map((l) => (l.suburb || "").toLowerCase()));
+        const missingFromMaster = knownLocations.filter(
+          (kl) => !dbSuburbs.has((kl.suburb || "").toLowerCase())
+        );
+        locations = [...dbLocations, ...missingFromMaster];
       }
     }
   } catch (err) {
