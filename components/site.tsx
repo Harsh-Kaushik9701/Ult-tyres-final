@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { navItems, services } from "@/lib/content";
 import Image from "next/image";
 
@@ -72,97 +73,171 @@ export function TopUtilityRibbon() {
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
+
+  // Close menus on route change
+  useEffect(() => {
+    setActiveDropdown(null);
+    setOpen(false);
+  }, [pathname]);
+
+  // Close menus on outside click or Escape key
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setActiveDropdown(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const toggleDropdown = (name: string) => {
+    setActiveDropdown((prev) => (prev === name ? null : name));
+  };
+
+  const handleMouseEnter = (name: string) => {
+    if (typeof window !== "undefined" && window.innerWidth > 990) {
+      setActiveDropdown(name);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (typeof window !== "undefined" && window.innerWidth > 990) {
+      setActiveDropdown(null);
+    }
+  };
+
   return (
     <>
       <TopUtilityRibbon />
       <header className="header">
         <div className="container header-main">
           <BrandMark />
-          <nav className={`nav ${open ? "open" : ""}`} aria-label="Main navigation">
-            <Link href="/" onClick={() => setOpen(false)}>
+          <nav ref={navRef} className={`nav ${open ? "open" : ""}`} aria-label="Main navigation">
+            <Link href="/" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
               Home
             </Link>
-            <Link href="/about" onClick={() => setOpen(false)}>
+            <Link href="/about" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
               About Us
             </Link>
 
             {/* Products Dropdown */}
-            <details className="nav-dropdown">
-              <summary>Products</summary>
-              <div className="nav-menu">
-                <div className="nav-menu-header">Commercial Tyre Range</div>
-                <Link href="/products" onClick={() => setOpen(false)}>
-                  Overview (All Tyres)
-                </Link>
-                <Link href="/products/trucks" onClick={() => setOpen(false)}>
-                  Truck Tyres (Linehaul / Regional / Tipper)
-                </Link>
-                <Link href="/products/buses" onClick={() => setOpen(false)}>
-                  Buses & Coach Tyres
-                </Link>
-                <div className="nav-menu-header" style={{ marginTop: 8 }}>
-                  Flagship Brand Ranges
+            <div
+              className={`nav-dropdown ${activeDropdown === "products" ? "open" : ""}`}
+              onMouseEnter={() => handleMouseEnter("products")}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                type="button"
+                className="nav-dropdown-btn"
+                onClick={() => toggleDropdown("products")}
+                aria-expanded={activeDropdown === "products"}
+                aria-haspopup="true"
+              >
+                Products <span className="chevron">⌄</span>
+              </button>
+              {activeDropdown === "products" && (
+                <div className="nav-menu" role="menu">
+                  <div className="nav-menu-header">Commercial Tyre Range</div>
+                  <Link href="/products" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    Overview (All Tyres)
+                  </Link>
+                  <Link href="/products/trucks" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    Truck Tyres (Linehaul / Regional / Tipper)
+                  </Link>
+                  <Link href="/products/buses" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    Buses & Coach Tyres
+                  </Link>
+                  <div className="nav-menu-header" style={{ marginTop: 8 }}>
+                    Flagship Brand Ranges
+                  </div>
+                  <Link href="/brands/ralson" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    ★ Ralson Commercial Radials
+                  </Link>
+                  <Link href="/brands/blacklion" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    ★ Blacklion Heavy Series
+                  </Link>
+                  <Link href="/brands/triangle" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    ★ Triangle Radial Range
+                  </Link>
                 </div>
-                <Link href="/brands/ralson" onClick={() => setOpen(false)}>
-                  ★ Ralson Commercial Radials
-                </Link>
-                <Link href="/brands/blacklion" onClick={() => setOpen(false)}>
-                  ★ Blacklion Heavy Series
-                </Link>
-                <Link href="/brands/triangle" onClick={() => setOpen(false)}>
-                  ★ Triangle Radial Range
-                </Link>
-              </div>
-            </details>
+              )}
+            </div>
 
-            {/* Fleet Services Dropdown (All 9 Services per Blueprint) */}
-            <details className="nav-dropdown">
-              <summary>Fleet Services</summary>
-              <div className="nav-menu nav-menu-wide">
-                <div className="nav-menu-header">Fleet Services & Maintenance</div>
-                <Link href="/services" onClick={() => setOpen(false)}>
-                  All Fleet Services Overview
-                </Link>
-                <Link href="/services/truck-maintenance" onClick={() => setOpen(false)}>
-                  1. Truck Maintenance
-                </Link>
-                <Link href="/services/wheel-alignment" onClick={() => setOpen(false)} style={{ color: "var(--yellow)", fontWeight: 700 }}>
-                  2. Wheel Alignment Services *(Specialist)*
-                </Link>
-                <Link href="/services/wheel-balancing" onClick={() => setOpen(false)}>
-                  3. Truck & Car Wheel Balancing
-                </Link>
-                <Link href="/services/steering-suspension" onClick={() => setOpen(false)}>
-                  4. Steering & Suspension Repair
-                </Link>
-                <Link href="/services/nitrogen-inflation" onClick={() => setOpen(false)}>
-                  5. Nitrogen Tyre Inflation
-                </Link>
-                <Link href="/services/puncture-proofing" onClick={() => setOpen(false)}>
-                  6. Puncture Proofing
-                </Link>
-                <Link href="/services/tyre-fitting" onClick={() => setOpen(false)}>
-                  7. Tyre Fitting Services
-                </Link>
-                <Link href="/services/ultimate-readyfit" onClick={() => setOpen(false)}>
-                  8. Ultimate Tyre Exchange (ReadyFit)
-                </Link>
-                <Link href="/services/u-wheels" onClick={() => setOpen(false)}>
-                  9. Wheel & Rim Solution (U-Wheels)
-                </Link>
-              </div>
-            </details>
+            {/* Fleet Services Dropdown */}
+            <div
+              className={`nav-dropdown ${activeDropdown === "services" ? "open" : ""}`}
+              onMouseEnter={() => handleMouseEnter("services")}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                type="button"
+                className="nav-dropdown-btn"
+                onClick={() => toggleDropdown("services")}
+                aria-expanded={activeDropdown === "services"}
+                aria-haspopup="true"
+              >
+                Fleet Services <span className="chevron">⌄</span>
+              </button>
+              {activeDropdown === "services" && (
+                <div className="nav-menu nav-menu-wide" role="menu">
+                  <div className="nav-menu-header">Fleet Services & Maintenance</div>
+                  <Link href="/services" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    All Fleet Services Overview
+                  </Link>
+                  <Link href="/services/truck-maintenance" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    1. Truck Maintenance
+                  </Link>
+                  <Link href="/services/wheel-alignment" onClick={() => { setOpen(false); setActiveDropdown(null); }} style={{ color: "var(--yellow)", fontWeight: 700 }}>
+                    2. Wheel Alignment Services *(Specialist)*
+                  </Link>
+                  <Link href="/services/wheel-balancing" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    3. Truck & Car Wheel Balancing
+                  </Link>
+                  <Link href="/services/steering-suspension" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    4. Steering & Suspension Repair
+                  </Link>
+                  <Link href="/services/nitrogen-inflation" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    5. Nitrogen Tyre Inflation
+                  </Link>
+                  <Link href="/services/puncture-proofing" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    6. Puncture Proofing
+                  </Link>
+                  <Link href="/services/tyre-fitting" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    7. Tyre Fitting Services
+                  </Link>
+                  <Link href="/services/ultimate-readyfit" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    8. Ultimate Tyre Exchange (ReadyFit)
+                  </Link>
+                  <Link href="/services/u-wheels" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
+                    9. Wheel & Rim Solution (U-Wheels)
+                  </Link>
+                </div>
+              )}
+            </div>
 
-            <Link href="/news" onClick={() => setOpen(false)}>
+            <Link href="/news" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
               News & Blogs
             </Link>
-            <Link href="/network" onClick={() => setOpen(false)}>
+            <Link href="/network" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
               Network Map
             </Link>
-            <Link href="/contact" onClick={() => setOpen(false)}>
+            <Link href="/contact" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
               Contact
             </Link>
-            <Link href="/careers" onClick={() => setOpen(false)}>
+            <Link href="/careers" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
               Join Us
             </Link>
           </nav>
@@ -297,14 +372,59 @@ export function SectionTitle({ eyebrow, title, text, dark=false }: { eyebrow:str
   return <div className="section-head"><div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2></div>{text&&<p>{text}</p>}</div>;
 }
 
-const banners=[
-  {kind:"image",src:"/images/hero-tyre.webp",eyebrow:"For the work that moves Australia",title:<>Your fleet.<br/><span>Our drive.</span></>,text:"Tyres, service and the people behind them. We help Australian fleets stay on the road and ready for what's next.",image:"/images/hero-tyre.webp",alt:"Ralson commercial tyre tread",cta:[{label:"Find your tyres",href:"/products"},{label:"Talk to our team",href:"/contact",outline:true}]},
-  {kind:"image",src:"/images/products/RMR61.webp",eyebrow:"Commercial tyres · Real applications",title:<>Built for<br/><span>the long haul.</span></>,text:"Find dependable commercial tyre options for line haul, regional routes and the last mile.",image:"/images/products/RMR61.webp",alt:"Ralson truck tyre render",cta:[{label:"Explore the range",href:"/products"},{label:"Get a quote",href:"/contact",outline:true}]},
-  {kind:"video",src:"/videos/ralson-performance.mp4",eyebrow:"Designed for demanding routes",title:<>Ready for<br/><span>what's ahead.</span></>,text:"Explore commercial radial tyres shaped by real-world performance and continuous engineering.",image:"/images/products/RMR51.webp",alt:"Ralson commercial radial tyre",cta:[{label:"See the range",href:"/products"},{label:"Talk to our team",href:"/contact",outline:true}]},
-  {kind:"video",src:"/videos/rdr75.mp4",eyebrow:"A better way to care for your fleet",title:<>More life<br/><span>in every mile.</span></>,text:"Pair the right tyre with practical maintenance, alignment and fitting support.",image:"/images/products/RDR75.webp",alt:"Ralson RDR75 commercial tyre",cta:[{label:"Fleet services",href:"/services"},{label:"Contact us",href:"/contact",outline:true}]},
-  {kind:"promo",src:"",eyebrow:"Dealer opportunities",title:<>Local knowledge.<br/><span>National backing.</span></>,text:"Join the Ultimate Tyres network and give your customers a stronger range, responsive support and a partner built around their work.",image:"",alt:"",cta:[{label:"Become a dealer",href:"/dealers/apply"},{label:"Explore our network",href:"/network",outline:true}]},
+const banners = [
+  {
+    kind: "video",
+    src: "/videos/ralson-performance.mp4",
+    eyebrow: "For the work that moves Australia",
+    title: <>Your fleet.<br/><span>Our drive.</span></>,
+    text: "Tyres, service and the people behind them. We help Australian fleets stay on the road and ready for what's next.",
+    image: "/images/hero-tyre.webp",
+    alt: "Ralson commercial tyre tread",
+    cta: [{ label: "Find your tyres", href: "/products" }, { label: "Talk to our team", href: "/contact", outline: true }]
+  },
+  {
+    kind: "video",
+    src: "/videos/rdr75.mp4",
+    eyebrow: "Commercial tyres · Real applications",
+    title: <>Built for<br/><span>the long haul.</span></>,
+    text: "Find dependable commercial tyre options for line haul, regional routes and the last mile.",
+    image: "/images/products/RMR61.webp",
+    alt: "Ralson truck tyre render",
+    cta: [{ label: "Explore the range", href: "/products" }, { label: "Get a quote", href: "/contact", outline: true }]
+  },
+  {
+    kind: "video",
+    src: "/videos/ralson-performance.mp4",
+    eyebrow: "Designed for demanding routes",
+    title: <>Ready for<br/><span>what's ahead.</span></>,
+    text: "Explore commercial radial tyres shaped by real-world performance, rigorous testing and continuous engineering.",
+    image: "/images/products/RMR51.webp",
+    alt: "Ralson commercial radial tyre",
+    cta: [{ label: "See the range", href: "/products" }, { label: "Talk to our team", href: "/contact", outline: true }]
+  },
+  {
+    kind: "video",
+    src: "/videos/rdr75.mp4",
+    eyebrow: "A better way to care for your fleet",
+    title: <>More life<br/><span>in every mile.</span></>,
+    text: "Pair the right tyre with practical maintenance, precision wheel alignment and fitting support.",
+    image: "/images/products/RDR75.webp",
+    alt: "Ralson RDR75 commercial tyre",
+    cta: [{ label: "Fleet services", href: "/services" }, { label: "Contact us", href: "/contact", outline: true }]
+  },
+  {
+    kind: "video",
+    src: "/videos/ralson-performance.mp4",
+    eyebrow: "Dealer opportunities",
+    title: <>Local knowledge.<br/><span>National backing.</span></>,
+    text: "Join the Ultimate Tyres dealer network. Strong wholesale tiers, dependable national supply, and dedicated fleet support.",
+    image: "/images/products/RAC82.webp",
+    alt: "Commercial radial tyre for dealer network",
+    cta: [{ label: "Become a dealer", href: "/dealers/apply" }, { label: "Explore our network", href: "/network", outline: true }]
+  },
 ];
-const stats=[{value:"50+",label:"Years of engineering"},{value:"30+",label:"Countries served"},{value:"100%",label:"Australian support"}];
+const stats = [{ value: "50+", label: "Years of engineering" }, { value: "30+", label: "Countries served" }, { value: "100%", label: "Australian support" }];
 const SLIDE_DURATION = 5500;
 
 export function HeroCarousel() {
@@ -335,12 +455,10 @@ export function HeroCarousel() {
       <div className="hero-bg-wrap">
         {banners.map((b, i) => (
           <div key={i} className={`hero-bg-layer${i === active ? " active" : ""}`}>
-            {b.kind === "video" ? (
+            {b.src && b.src.endsWith(".mp4") ? (
               <video autoPlay muted loop playsInline poster={b.image}>
                 <source src={b.src} type="video/mp4" />
               </video>
-            ) : b.kind === "image" ? (
-              <Image src={b.src} alt="" fill priority={i === 0} sizes="100vw" />
             ) : null}
           </div>
         ))}
@@ -369,27 +487,13 @@ export function HeroCarousel() {
           </div>
         </div>
         <div className="hero-image">
-          {active === 4 ? (
-            <div className="banner-promo">
-              <strong>Dealer opportunities</strong>
-              <span>
-                Local knowledge.
-                <br />
-                National backing.
-              </span>
-              <Link className="text-link" href="/network">
-                Explore our network
-              </Link>
-            </div>
-          ) : (
-            <Image
-              src={slide.image}
-              alt={slide.alt}
-              width={800}
-              height={800}
-              priority={active === 0}
-            />
-          )}
+          <Image
+            src={slide.image}
+            alt={slide.alt}
+            width={800}
+            height={800}
+            priority={active === 0}
+          />
         </div>
         <div className="hero-stats">
           {stats.map((s, i) => (
