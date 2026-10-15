@@ -73,7 +73,7 @@ export default function HomePage() {
             <div className="brand-card" style={{ display: "flex", flexDirection: "column", padding: 30 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <span className="brand-index">02 / DEEP-TREAD TRACTION</span>
-                <span style={{ fontSize: 11, background: "var(--yellow)", color: "#000", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
+                <span style={{ fontSize: 11, background: "var(--red)", color: "#fff", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
                   22.5mm Deep Tread
                 </span>
               </div>
@@ -104,7 +104,7 @@ export default function HomePage() {
             <div className="brand-card" style={{ display: "flex", flexDirection: "column", padding: 30 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <span className="brand-index">03 / GLOBAL SCALE</span>
-                <span style={{ fontSize: 11, background: "#000000", color: "var(--yellow)", border: "1px solid var(--yellow)", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
+                <span style={{ fontSize: 11, background: "var(--charcoal-900)", color: "var(--red)", border: "1px solid var(--red)", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
                   Proven Endurance
                 </span>
               </div>
@@ -229,7 +229,7 @@ export default function HomePage() {
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <span style={{ fontSize: 11, background: "var(--yellow)", color: "#000", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
+                <span style={{ fontSize: 11, background: "var(--red)", color: "#fff", padding: "3px 8px", borderRadius: 4, fontWeight: 800 }}>
                   B2B DEALER CONSOLE
                 </span>
                 <span style={{ fontSize: 11, color: "#4ade80", fontWeight: 700 }}>● Live Inventory Active</span>

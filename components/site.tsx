@@ -200,7 +200,7 @@ export function Header() {
                   <Link href="/services/truck-maintenance" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
                     1. Truck Maintenance
                   </Link>
-                  <Link href="/services/wheel-alignment" onClick={() => { setOpen(false); setActiveDropdown(null); }} style={{ color: "var(--yellow)", fontWeight: 700 }}>
+                  <Link href="/services/wheel-alignment" onClick={() => { setOpen(false); setActiveDropdown(null); }} style={{ color: "var(--red)", fontWeight: 700 }}>
                     2. Wheel Alignment Services *(Specialist)*
                   </Link>
                   <Link href="/services/wheel-balancing" onClick={() => { setOpen(false); setActiveDropdown(null); }}>
@@ -301,7 +301,7 @@ export function Footer() {
           <div>
             <h4>Fleet Services</h4>
             <div className="footer-links">
-              <Link href="/services/wheel-alignment" style={{ color: "var(--yellow)", fontWeight: 700 }}>
+              <Link href="/services/wheel-alignment" style={{ color: "var(--red)", fontWeight: 700 }}>
                 Wheel Alignment Services ↗
               </Link>
               <Link href="/services/truck-maintenance">Truck Maintenance</Link>

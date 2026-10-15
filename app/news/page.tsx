@@ -38,8 +38,8 @@ export default function NewsPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                   <span
                     style={{
-                      background: i === 0 ? "var(--yellow)" : "#f3f4f6",
-                      color: i === 0 ? "#000000" : "var(--ink)",
+                      background: i === 0 ? "var(--red)" : "var(--white-200)",
+                      color: i === 0 ? "#ffffff" : "var(--ink)",
                       fontSize: 10,
                       fontWeight: 800,
                       textTransform: "uppercase",

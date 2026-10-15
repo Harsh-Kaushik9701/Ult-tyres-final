@@ -209,7 +209,7 @@ export function DealerProductCatalog({ products }: { products: DealerProduct[] }
         <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>
           Displaying {filtered.length} verified commercial specifications · Rocklea & Regional stock available
         </span>
-        <span style={{ fontSize: 11, background: "var(--yellow)", color: "#000000", padding: "4px 10px", borderRadius: 4, fontWeight: 800 }}>
+        <span style={{ fontSize: 11, background: "var(--red)", color: "#ffffff", padding: "4px 10px", borderRadius: 4, fontWeight: 800 }}>
           ★ Tier 1 Wholesale Rates Active
         </span>
       </div>
@@ -234,8 +234,8 @@ export function DealerProductCatalog({ products }: { products: DealerProduct[] }
                     position: "absolute",
                     top: 10,
                     right: 10,
-                    background: p.brand === "Ralson" ? "#000000" : p.brand === "Blacklion" ? "var(--yellow)" : "#1a1a1a",
-                    color: p.brand === "Blacklion" ? "#000000" : "#ffffff",
+                    background: p.brand === "Ralson" ? "var(--charcoal-900)" : p.brand === "Blacklion" ? "var(--red)" : "var(--charcoal-700)",
+                    color: "#ffffff",
                     fontSize: 10,
                     fontWeight: 800,
                     padding: "3px 8px",
