@@ -1,10 +1,13 @@
 import Link from "next/link";
-import { currentSession } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { getVerifiedSession } from "@/lib/auth";
 import { getDb, isMongoConfigured } from "@/lib/db";
 import { allCatalogueProducts } from "@/lib/catalogue-data";
 
 export default async function PortalHome() {
-  const session = await currentSession();
+  // Checked here as well as in the layout: pages and layouts render independently.
+  const session = await getVerifiedSession("dealer");
+  if (!session) redirect("/dealers/login");
   let stats = {
     orders: 28,
     open: 3,

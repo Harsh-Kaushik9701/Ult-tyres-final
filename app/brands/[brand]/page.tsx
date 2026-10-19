@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { brands } from "@/lib/content";
 import { PageHero, ContactBand } from "@/components/site";
 import { ProductCatalog } from "@/components/catalog";
-import { getProducts } from "@/lib/products";
+import { getPublicProducts } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
 
@@ -20,10 +21,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { brand: slug } = await params;
   const b = brands.find((x) => x.slug.toLowerCase() === slug.toLowerCase());
-  return {
-    title: b ? `${b.name} Commercial Tyres` : "Tyres",
-    description: b?.copy || "Commercial tyre range and specifications from Ultimate Tyres Australia."
-  };
+  if (!b) return { title: "Brand not found", robots: { index: false, follow: false } };
+  return buildMetadata({
+    title: `${b.name} Commercial Tyres – Truck & Bus Range`,
+    description: b.copy,
+    keywords: [`${b.name} tyres`, `${b.name} truck tyres`, `${b.name} tyres Australia`, "commercial radial tyres"],
+    path: `/brands/${b.slug}`
+  });
 }
 
 export default async function BrandPage({
@@ -35,7 +39,7 @@ export default async function BrandPage({
   const brand = brands.find((x) => x.slug.toLowerCase() === slug.toLowerCase());
   if (!brand) return notFound();
 
-  const all = await getProducts();
+  const all = await getPublicProducts();
   const brandProducts = all.filter((p) => p.brand.toLowerCase() === brand.name.toLowerCase());
 
   // Distinct brand image for showcase
@@ -114,7 +118,7 @@ export default async function BrandPage({
               Wholesale Order Portal ↗
             </Link>
           </div>
-          <ProductCatalog products={brandProducts as any} />
+          <ProductCatalog products={brandProducts} />
         </div>
       </section>
 

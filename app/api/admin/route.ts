@@ -1,20 +1,36 @@
 import { NextResponse } from "next/server";
-import { currentSession } from "@/lib/session";
+import { getVerifiedSession } from "@/lib/auth";
 import { getDb, isMongoConfigured } from "@/lib/db";
 import { locations as defaultLocations } from "@/lib/content";
 import { allCatalogueProducts } from "@/lib/catalogue-data";
-import { ObjectId } from "mongodb";
+import { ObjectId, type Filter, type Document } from "mongodb";
+import { BadRequest, cleanText, forbiddenCrossSite, isSameOrigin, jsonError, readJsonBody, str } from "@/lib/security";
 
-function matchIdQuery(id: any) {
-  if (typeof id === "string" && ObjectId.isValid(id) && id.length === 24) {
-    return { $or: [{ _id: new ObjectId(id) }, { id: id }, { id: Number(id) || id }] };
-  }
-  return { $or: [{ id: id }, { id: Number(id) || id }, { _id: id }] };
+/**
+ * Builds a lookup query from an untrusted id. Only plain strings/numbers are
+ * accepted – objects such as {"$ne": null} are rejected, which blocks NoSQL
+ * operator injection.
+ */
+function matchIdQuery(raw: unknown): Filter<Document> | null {
+  if (typeof raw === "number" && Number.isFinite(raw)) return { id: raw };
+  if (typeof raw !== "string") return null;
+  const id = raw.trim();
+  if (!id || id.length > 64) return null;
+  if (/^[a-f0-9]{24}$/i.test(id)) return { $or: [{ _id: new ObjectId(id) }, { id }] };
+  if (/^\d{1,12}$/.test(id)) return { $or: [{ id: Number(id) }, { id }] };
+  if (/^[\w-]+$/.test(id)) return { id };
+  return null;
+}
+
+function optionalNumber(value: unknown, min: number, max: number) {
+  if (value === "" || value == null) return null;
+  const n = Number(value);
+  return Number.isFinite(n) && n >= min && n <= max ? n : undefined;
 }
 
 export async function GET() {
-  const session = await currentSession();
-  if (session?.role !== "admin") {
+  const session = await getVerifiedSession("admin");
+  if (!session) {
     return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
   }
 
@@ -117,8 +133,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const session = await currentSession();
-  if (session?.role !== "admin") {
+  if (!isSameOrigin(request)) return forbiddenCrossSite();
+  const session = await getVerifiedSession("admin");
+  if (!session) {
     return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
   }
 
@@ -129,20 +146,40 @@ export async function PATCH(request: Request) {
     );
   }
 
+  let body: Record<string, unknown>;
   try {
-    const body = await request.json();
+    body = await readJsonBody(request, 16 * 1024);
+  } catch (error) {
+    if (error instanceof BadRequest) return jsonError("Invalid request.", 400);
+    throw error;
+  }
+
+  const needsId = ["approve", "decline", "stock", "order-status", "delete-location", "product"];
+  const idQuery = matchIdQuery(body.action === "stock" ? body.productId : body.id);
+  if (needsId.includes(String(body.action)) && !idQuery) return jsonError("Invalid record id.", 400);
+  // Matches nothing when no id was required for this action.
+  const appQuery: Filter<Document> = idQuery ?? { _id: { $exists: false }, id: { $exists: false } };
+
+  try {
     const db = await getDb();
 
     if (body.action === "approve") {
-      const appQuery = matchIdQuery(body.id);
       const app = await db.collection("dealer_applications").findOne({ ...appQuery, status: "pending" });
       if (!app) {
         return NextResponse.json({ error: "Application is no longer pending." }, { status: 404 });
       }
+      const passwordHash = app.password_hash || app.passwordHash;
+      if (typeof passwordHash !== "string" || !passwordHash.startsWith("$2")) {
+        return jsonError("This application has no valid password and can’t be activated.", 400);
+      }
+      const email = String(app.email).toLowerCase().trim();
+      if (await db.collection("accounts").findOne({ email }, { projection: { _id: 1 } })) {
+        return jsonError("An account with this email already exists.", 409);
+      }
 
       const accountDoc = {
-        email: String(app.email).toLowerCase().trim(),
-        password_hash: app.password_hash || app.passwordHash || "",
+        email,
+        password_hash: passwordHash,
         role: "dealer",
         active: true,
         created_at: new Date()
@@ -168,7 +205,6 @@ export async function PATCH(request: Request) {
     }
 
     if (body.action === "decline") {
-      const appQuery = matchIdQuery(body.id);
       await db.collection("dealer_applications").updateOne(appQuery, {
         $set: { status: "declined", reviewed_at: new Date() }
       });
@@ -176,13 +212,12 @@ export async function PATCH(request: Request) {
     }
 
     if (body.action === "stock") {
-      const id = body.productId;
       const quantity = Number(body.quantity);
-      if (!Number.isInteger(quantity) || quantity < 0) {
+      if (!Number.isInteger(quantity) || quantity < 0 || quantity > 1_000_000) {
         return NextResponse.json({ error: "Enter a valid non-negative stock quantity." }, { status: 400 });
       }
       await db.collection("products").updateOne(
-        matchIdQuery(id),
+        appQuery,
         { $set: { stock: quantity, updated_at: new Date() } },
         { upsert: false }
       );
@@ -190,10 +225,10 @@ export async function PATCH(request: Request) {
     }
 
     if (body.action === "price") {
-      const dealerId = String(body.dealerId || "");
-      const productId = body.productId;
+      const dealerId = str(body.dealerId, 64);
+      const productId = str(body.productId, 64);
       const price = Number(body.price);
-      if (!dealerId || !Number.isFinite(price) || price < 0) {
+      if (!/^[\w-]{1,64}$/.test(dealerId) || !/^[\w-]{1,64}$/.test(productId) || !Number.isFinite(price) || price < 0 || price > 1_000_000) {
         return NextResponse.json({ error: "Enter a dealer, product and valid price." }, { status: 400 });
       }
       await db.collection("dealer_prices").updateOne(
@@ -205,32 +240,39 @@ export async function PATCH(request: Request) {
     }
 
     if (body.action === "order-status") {
-      const status = ["submitted", "processing", "fulfilled", "dispatched", "delivered", "cancelled"].includes(body.status)
-        ? body.status
-        : "submitted";
-      await db.collection("orders").updateOne(matchIdQuery(body.id), {
+      const statuses = ["submitted", "processing", "fulfilled", "dispatched", "delivered", "cancelled"];
+      if (!statuses.includes(String(body.status))) return jsonError("Unknown order status.", 400);
+      const status = String(body.status);
+      const orderQuery = typeof body.id === "string" && /^UT-\d{6}$/.test(body.id) ? { orderId: body.id } : appQuery;
+      await db.collection("orders").updateOne(orderQuery, {
         $set: { status, updated_at: new Date() }
       });
       return NextResponse.json({ message: "Order status updated." });
     }
 
     if (body.action === "location") {
+      const latitude = optionalNumber(body.latitude, -90, 90);
+      const longitude = optionalNumber(body.longitude, -180, 180);
       const doc = {
-        name: String(body.name || "").trim(),
-        address: String(body.address || "").trim(),
-        suburb: String(body.suburb || "").trim(),
-        state: String(body.state || "").trim(),
-        postcode: String(body.postcode || "").trim(),
-        phone: String(body.phone || "").trim(),
-        latitude: body.latitude === "" || body.latitude == null ? null : Number(body.latitude),
-        longitude: body.longitude === "" || body.longitude == null ? null : Number(body.longitude),
+        name: cleanText(body.name, 160),
+        address: cleanText(body.address, 200),
+        suburb: cleanText(body.suburb, 100),
+        state: str(body.state, 3).toUpperCase(),
+        postcode: str(body.postcode, 4),
+        phone: str(body.phone, 40),
+        latitude,
+        longitude,
         updated_at: new Date()
       };
-      if (!doc.name || !doc.address || !doc.suburb || !doc.state) {
-        return NextResponse.json({ error: "Location name, address, suburb and state are required." }, { status: 400 });
+      if (!doc.name || !doc.address || !doc.suburb || !["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"].includes(doc.state)) {
+        return NextResponse.json({ error: "Location name, address, suburb and a valid state are required." }, { status: 400 });
+      }
+      if (latitude === undefined || longitude === undefined || (doc.postcode && !/^\d{4}$/.test(doc.postcode))) {
+        return jsonError("Check the postcode and map coordinates.", 400);
       }
       if (body.id) {
-        await db.collection("locations").updateOne(matchIdQuery(body.id), { $set: doc });
+        if (!idQuery) return jsonError("Invalid record id.", 400);
+        await db.collection("locations").updateOne(idQuery, { $set: doc });
       } else {
         await db.collection("locations").insertOne({ ...doc, created_at: new Date(), active: true });
       }
@@ -238,20 +280,20 @@ export async function PATCH(request: Request) {
     }
 
     if (body.action === "delete-location") {
-      await db.collection("locations").deleteOne(matchIdQuery(body.id));
+      await db.collection("locations").deleteOne(appQuery);
       return NextResponse.json({ message: "Location removed." });
     }
 
     if (body.action === "product") {
-      const brand = String(body.brand || "").trim();
-      const pattern = String(body.pattern || "").trim();
-      const size = String(body.size || "").trim();
-      const application = String(body.application || "").trim();
+      const brand = cleanText(body.brand, 60);
+      const pattern = cleanText(body.pattern, 60);
+      const size = cleanText(body.size, 40);
+      const application = cleanText(body.application, 80);
       if (!brand || !pattern || !size || !application) {
         return NextResponse.json({ error: "Brand, pattern, size and application are required." }, { status: 400 });
       }
       await db.collection("products").updateOne(
-        matchIdQuery(body.id),
+        appQuery,
         {
           $set: {
             brand,

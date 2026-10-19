@@ -1,3 +1,10 @@
-import {NextResponse} from "next/server";
-import {sessionCookieName} from "@/lib/session";
-export async function POST(){const response=NextResponse.json({ok:true});response.cookies.set(sessionCookieName,"",{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"strict",path:"/",maxAge:0});return response;}
+import { NextResponse } from "next/server";
+import { sessionCookieName, sessionCookieOptions } from "@/lib/session";
+import { forbiddenCrossSite, isSameOrigin } from "@/lib/security";
+
+export async function POST(request: Request) {
+  if (!isSameOrigin(request)) return forbiddenCrossSite();
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set(sessionCookieName, "", sessionCookieOptions(request, 0));
+  return response;
+}

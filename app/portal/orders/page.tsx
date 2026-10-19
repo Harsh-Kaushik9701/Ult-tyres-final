@@ -1,12 +1,15 @@
 import { RapidOrderForm } from "@/components/portal";
-import { currentSession } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { getVerifiedSession } from "@/lib/auth";
 import { getDb, isMongoConfigured } from "@/lib/db";
 import { allCatalogueProducts } from "@/lib/catalogue-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function PortalOrders() {
-  const session = await currentSession();
+  // Checked here as well as in the layout: pages and layouts render independently.
+  const session = await getVerifiedSession("dealer");
+  if (!session) redirect("/dealers/login");
   const products = allCatalogueProducts.map((p) => ({
     id: p.id,
     brand: p.brand,
@@ -69,7 +72,7 @@ export default async function PortalOrders() {
       const db = await getDb();
       const docs = await db
         .collection("orders")
-        .find(session?.dealerId ? { dealerId: session.dealerId } : {})
+        .find({ dealerId: session.dealerId })
         .sort({ created_at: -1 })
         .limit(50)
         .toArray();

@@ -1,11 +1,28 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { articles, brands, services } from "@/lib/content";
+import { articles, services } from "@/lib/content";
 import { ContactBand, HeroCarousel, SectionTitle } from "@/components/site";
+import { JsonLd } from "@/components/json-ld";
+import { buildMetadata, organizationSchema } from "@/lib/seo";
+import { staticPageSeo } from "@/lib/page-seo";
+import { siteConfig } from "@/lib/site-config";
+
+export const metadata: Metadata = buildMetadata({
+  ...staticPageSeo.home,
+  absoluteTitle: true,
+  path: "/"
+});
 
 export default function HomePage() {
   return (
     <>
+      <JsonLd
+        data={[
+          organizationSchema(),
+          { "@context": "https://schema.org", "@type": "WebSite", name: siteConfig.name, url: siteConfig.url }
+        ]}
+      />
       <HeroCarousel />
 
       {/* Trust Strip */}
@@ -52,7 +69,7 @@ export default function HomePage() {
                   alt="Ralson RDR75 commercial tyre"
                   width={220}
                   height={160}
-                  style={{ objectFit: "contain", maxHeight: 150 }}
+                  style={{ objectFit: "contain", maxHeight: 150, width: "auto" }}
                 />
               </div>
               <h3>Ralson Commercial Radials</h3>
@@ -83,7 +100,7 @@ export default function HomePage() {
                   alt="Blacklion commercial drive tyre"
                   width={220}
                   height={160}
-                  style={{ objectFit: "contain", maxHeight: 150 }}
+                  style={{ objectFit: "contain", maxHeight: 150, width: "auto" }}
                 />
               </div>
               <h3>Blacklion Heavy Series</h3>
@@ -114,7 +131,7 @@ export default function HomePage() {
                   alt="Triangle commercial radial tyre"
                   width={220}
                   height={160}
-                  style={{ objectFit: "contain", maxHeight: 150 }}
+                  style={{ objectFit: "contain", maxHeight: 150, width: "auto" }}
                 />
               </div>
               <h3>Triangle Radial Range</h3>
@@ -268,7 +285,7 @@ export default function HomePage() {
             </ul>
             <div className="hero-actions" style={{ marginTop: 24 }}>
               <Link className="button button-dark" href="/dealers/login">
-                Dealer Login (Test Demo Access) ↗
+                Dealer Login ↗
               </Link>
               <Link className="button button-outline" href="/dealers/apply">
                 Apply for Trade Account
@@ -303,7 +320,7 @@ export default function HomePage() {
           </div>
           <div style={{ marginTop: 28 }}>
             <Link className="text-link" href="/news">
-              Explore all fleet insights & technical blogs
+              Explore all fleet insights
             </Link>
           </div>
         </div>

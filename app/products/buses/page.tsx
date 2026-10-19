@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { ProductCatalog } from "@/components/catalog";
 import { PageHero } from "@/components/site";
-import { getProducts } from "@/lib/products";
+import { getPublicProducts } from "@/lib/products";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Commercial Bus & Coach Tyres · Urban Transit & Long-Distance",
-  description: "Find certified commercial bus, electric bus and passenger coach radial tyres engineered for urban curb scrubbing and passenger comfort."
-};
-
+export const metadata: Metadata = buildMetadata({
+  title: "Bus & Coach Tyres – Urban Transit & Long Distance",
+  description: "Commercial bus, electric bus and coach radial tyres engineered for urban kerb scrubbing, passenger comfort and long-distance coach routes in Australia.",
+  keywords: ["bus tyres", "coach tyres", "electric bus tyres", "275/70R22.5 tyres", "transit bus tyres"],
+  path: "/products/buses"
+});
 export const dynamic = "force-dynamic";
 
 export default async function BusesPage() {
-  const products = await getProducts();
+  const products = await getPublicProducts();
   const filtered = products.filter(
     (p) =>
       p.application.toLowerCase().includes("bus") ||
@@ -40,7 +42,7 @@ export default async function BusesPage() {
               <Link className="button" href="/dealers/login">Wholesale Dealer Portal ↗</Link>
             </div>
           </div>
-          <ProductCatalog products={filtered as any} />
+          <ProductCatalog products={filtered} />
         </div>
       </section>
     </>

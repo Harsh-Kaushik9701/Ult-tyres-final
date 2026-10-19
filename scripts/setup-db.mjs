@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -247,62 +248,53 @@ async function setup() {
       console.log(`Seeded ${products.length} commercial tyre products into MongoDB.`);
     }
 
-    // 4. Seed Admin Account if credentials provided
-    const adminEmail = (process.env.BOOTSTRAP_ADMIN_EMAIL || "admin@ultimatetyres.com.au").toLowerCase().trim();
-    const adminPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD || "admin123";
-    const adminHash = await bcrypt.hash(adminPassword, 12);
+    // 4. Seed Admin Account – only with an explicit, strong password.
+    const adminEmail = (process.env.BOOTSTRAP_ADMIN_EMAIL || "").toLowerCase().trim();
+    const adminPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD || "";
+    if (adminEmail && adminPassword.length >= 12) {
+      const adminHash = await bcrypt.hash(adminPassword, 12);
+      await db.collection("accounts").updateOne(
+        { email: adminEmail },
+        { $set: { email: adminEmail, password_hash: adminHash, role: "admin", active: true, updated_at: new Date() } },
+        { upsert: true }
+      );
+      console.log(`Admin account ready: ${adminEmail}`);
+    } else {
+      console.log("Skipped admin account: set BOOTSTRAP_ADMIN_EMAIL and a BOOTSTRAP_ADMIN_PASSWORD of 12+ characters.");
+    }
 
-    await db.collection("accounts").updateOne(
-      { email: adminEmail },
-      {
-        $set: {
-          email: adminEmail,
-          password_hash: adminHash,
-          role: "admin",
-          active: true,
-          updated_at: new Date()
-        }
-      },
-      { upsert: true }
-    );
-    console.log(`Admin account ready: ${adminEmail}`);
-
-    // 5. Seed Demo Dealer Account
-    const dealerEmail = "dealer@ultimatetyres.com.au";
-    const dealerHash = await bcrypt.hash("dealer123", 12);
-    const accountRes = await db.collection("accounts").findOneAndUpdate(
-      { email: dealerEmail },
-      {
-        $set: {
-          email: dealerEmail,
-          password_hash: dealerHash,
-          role: "dealer",
-          active: true,
-          updated_at: new Date()
-        }
-      },
-      { upsert: true, returnDocument: "after" }
-    );
-
-    const accountId = accountRes?._id || "demo-dealer-account";
-    await db.collection("dealers").updateOne(
-      { email: dealerEmail },
-      {
-        $set: {
-          accountId,
-          business_name: "Queensland Transport Tyres Pty Ltd",
-          abn: "45 109 874 321",
-          phone: "07 3187 7527",
-          state: "QLD",
-          email: dealerEmail,
-          address: "Unit 3, 12 Grindle Road, Rocklea QLD 4106",
-          active: true,
-          updated_at: new Date()
-        }
-      },
-      { upsert: true }
-    );
-    console.log(`Demo dealer account ready: ${dealerEmail} / dealer123`);
+    // 5. Optional demo dealer – never created unless explicitly requested.
+    if (process.env.SEED_DEMO_DEALER === "true") {
+      const dealerEmail = "dealer@ultimatetyres.com.au";
+      const dealerPassword = process.env.DEMO_DEALER_PASSWORD && process.env.DEMO_DEALER_PASSWORD.length >= 12
+        ? process.env.DEMO_DEALER_PASSWORD
+        : randomBytes(12).toString("base64url");
+      const dealerHash = await bcrypt.hash(dealerPassword, 12);
+      const accountRes = await db.collection("accounts").findOneAndUpdate(
+        { email: dealerEmail },
+        { $set: { email: dealerEmail, password_hash: dealerHash, role: "dealer", active: true, updated_at: new Date() } },
+        { upsert: true, returnDocument: "after" }
+      );
+      await db.collection("dealers").updateOne(
+        { email: dealerEmail },
+        {
+          $set: {
+            accountId: accountRes._id,
+            business_name: "Queensland Transport Tyres Pty Ltd",
+            abn: "45 109 874 321",
+            phone: "07 3187 7527",
+            state: "QLD",
+            email: dealerEmail,
+            address: "Unit 3, 12 Grindle Road, Rocklea QLD 4106",
+            active: true,
+            updated_at: new Date()
+          }
+        },
+        { upsert: true }
+      );
+      console.log(`Demo dealer account ready: ${dealerEmail} / ${dealerPassword}`);
+      console.log("WARNING: delete or deactivate this demo dealer before going live.");
+    }
 
     console.log("\n MongoDB setup complete successfully!");
   } catch (err) {

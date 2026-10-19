@@ -17,9 +17,13 @@ export function ProductCatalog({products}:{products:TyreProduct[]}) {
   </>;
 }
 
-export function LoginForm() {
-  const [email, setEmail] = useState("dealer@ultimatetyres.com.au");
-  const [password, setPassword] = useState("dealer123");
+/**
+ * Dealer sign-in. `demo` is true only on local test setups (ENABLE_DEMO_LOGIN=true
+ * and not a production build) – live sites never show or prefill demo credentials.
+ */
+export function LoginForm({ demo = false }: { demo?: boolean }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -33,9 +37,9 @@ export function LoginForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      location.href = data.role === "admin" ? "/admin" : "/portal";
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Unable to sign in.");
+      location.assign(data.role === "admin" ? "/admin" : "/portal");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Unable to sign in.");
       setBusy(false);
@@ -56,8 +60,8 @@ export function LoginForm() {
         Controlled Login ID & Password issued by Ultimate Tyres. Sign in to access live wholesale pricing, rapid-order forms, and order fulfillment.
       </p>
 
-      {/* Demo helper pill */}
-      <div
+      {/* Demo helper – local testing only */}
+      {demo && <div
         style={{
           background: "#f0fdf4",
           border: "1px solid #86efac",
@@ -88,8 +92,10 @@ export function LoginForm() {
         </div>
         <div style={{ color: "#15803d", marginTop: 4 }}>
           ID: <code>dealer@ultimatetyres.com.au</code> · Pass: <code>dealer123</code>
+          <br />
+          Admin: <code>admin@ultimatetyres.com.au</code> · Pass: <code>admin123</code>
         </div>
-      </div>
+      </div>}
 
       <div className="form-grid">
         <div className="form-field full">
@@ -115,6 +121,7 @@ export function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            maxLength={200}
             required
           />
         </div>

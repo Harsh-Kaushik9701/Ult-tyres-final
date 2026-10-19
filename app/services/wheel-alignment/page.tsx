@@ -1,40 +1,42 @@
-"use client";
-
-import { useState, useMemo } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { ContactBand } from "@/components/site";
+import { AlignmentCalculator } from "@/components/alignment-calculator";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbSchema, buildMetadata } from "@/lib/seo";
+import { staticPageSeo } from "@/lib/page-seo";
+import { absoluteUrl, siteConfig } from "@/lib/site-config";
 
+export const metadata: Metadata = buildMetadata({
+  ...staticPageSeo.wheelAlignment,
+  path: "/services/wheel-alignment"
+});
+
+/**
+ * Server Component: all of this page's content renders on the server. Only the
+ * savings calculator is interactive and ships as a small client island.
+ */
 export default function WheelAlignmentPage() {
-  // ROI Calculator State
-  const [truckCount, setTruckCount] = useState(10);
-  const [kmPerYear, setKmPerYear] = useState(130000);
-  const [fuelEconomy, setFuelEconomy] = useState(42); // L / 100km
-  const [dieselPrice, setDieselPrice] = useState(2.05); // $/L
-
-  const calculations = useMemo(() => {
-    const totalKm = truckCount * kmPerYear;
-    const totalLitres = (totalKm / 100) * fuelEconomy;
-    const totalFuelCost = totalLitres * dieselPrice;
-    
-    // Conservative 5.5% fuel saving from squaring misaligned tandem drive axles & steer
-    const fuelSavings = totalFuelCost * 0.055;
-    
-    // Tyre savings: 30% longer tyre life on steer and drive axles (approx $1,600 tyre spend per truck per year saved)
-    const tyreSavings = truckCount * 1750;
-    
-    const totalSavings = fuelSavings + tyreSavings;
-
-    return {
-      totalFuelCost,
-      fuelSavings,
-      tyreSavings,
-      totalSavings
-    };
-  }, [truckCount, kmPerYear, fuelEconomy, dieselPrice]);
-
   return (
     <>
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Fleet Services", path: "/services" },
+            { name: "Wheel Alignment Services", path: "/services/wheel-alignment" }
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: "Heavy truck & fleet wheel alignment",
+            serviceType: "Wheel alignment",
+            url: absoluteUrl("/services/wheel-alignment"),
+            areaServed: { "@type": "Country", name: "Australia" },
+            provider: { "@type": "Organization", name: siteConfig.legalName, url: siteConfig.url }
+          }
+        ]}
+      />
       {/* Hero Section */}
       <section className="page-hero" style={{ background: "linear-gradient(135deg, #141717 0%, #1e2424 100%)", color: "#fff", position: "relative" }}>
         <div className="container">
@@ -169,107 +171,7 @@ export default function WheelAlignmentPage() {
             </p>
           </div>
 
-          <div className="alignment-calc-grid">
-            {/* Controls */}
-            <div style={{ background: "#1c2020", padding: "clamp(18px, 4vw, 32px)", borderRadius: 10, border: "1px solid #2d3333" }}>
-              <div style={{ marginBottom: 22 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <label style={{ fontSize: 13, fontWeight: 700, color: "#e5e7eb" }}>Number of Commercial Vehicles in Fleet</label>
-                  <strong style={{ color: "var(--yellow)", fontSize: 16 }}>{truckCount} Prime Movers</strong>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={truckCount}
-                  onChange={(e) => setTruckCount(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--yellow)" }}
-                />
-              </div>
-
-              <div style={{ marginBottom: 22 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <label style={{ fontSize: 13, fontWeight: 700, color: "#e5e7eb" }}>Average Kilometres per Truck / Year</label>
-                  <strong style={{ color: "#fff", fontSize: 16 }}>{kmPerYear.toLocaleString()} km</strong>
-                </div>
-                <input
-                  type="range"
-                  min="50000"
-                  max="250000"
-                  step="5000"
-                  value={kmPerYear}
-                  onChange={(e) => setKmPerYear(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--yellow)" }}
-                />
-              </div>
-
-              <div style={{ marginBottom: 22 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <label style={{ fontSize: 13, fontWeight: 700, color: "#e5e7eb" }}>Average Fleet Fuel Economy</label>
-                  <strong style={{ color: "#fff", fontSize: 16 }}>{fuelEconomy} L / 100km</strong>
-                </div>
-                <input
-                  type="range"
-                  min="30"
-                  max="60"
-                  step="1"
-                  value={fuelEconomy}
-                  onChange={(e) => setFuelEconomy(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--yellow)" }}
-                />
-              </div>
-
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <label style={{ fontSize: 13, fontWeight: 700, color: "#e5e7eb" }}>Current Diesel Price per Litre</label>
-                  <strong style={{ color: "#fff", fontSize: 16 }}>${dieselPrice.toFixed(2)} / Litre</strong>
-                </div>
-                <input
-                  type="range"
-                  min="1.60"
-                  max="2.60"
-                  step="0.05"
-                  value={dieselPrice}
-                  onChange={(e) => setDieselPrice(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--yellow)" }}
-                />
-              </div>
-            </div>
-
-            {/* Results Display */}
-            <div style={{ background: "linear-gradient(145deg, #181c1c, #0d0f0f)", padding: "clamp(18px, 4vw, 36px)", borderRadius: 10, border: "2px solid var(--yellow)" }}>
-              <span style={{ fontSize: 11, color: "var(--yellow)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5 }}>
-                Estimated Annual Savings
-              </span>
-              <div style={{ fontSize: "clamp(34px, 8vw, 52px)", fontWeight: 900, color: "#fff", margin: "12px 0 20px", fontFamily: "var(--display)", letterSpacing: ".02em" }}>
-                ${Math.round(calculations.totalSavings).toLocaleString("en-AU")}
-                <span style={{ fontSize: 18, color: "#9ca3af", fontWeight: 400 }}> / year</span>
-              </div>
-
-              <div className="alignment-stats-grid">
-                <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Annual Fuel Cost Reduction (5.5%)</span>
-                  <strong style={{ fontSize: 22, color: "#4ade80" }}>
-                    +${Math.round(calculations.fuelSavings).toLocaleString("en-AU")}
-                  </strong>
-                </div>
-                <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Extended Casing & Tread Life</span>
-                  <strong style={{ fontSize: 22, color: "var(--yellow)" }}>
-                    +${Math.round(calculations.tyreSavings).toLocaleString("en-AU")}
-                  </strong>
-                </div>
-              </div>
-
-              <p style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.5, margin: "0 0 20px" }}>
-                *Based on conservative 5.5% fuel recovery from correcting thrust angle and steer scuffing on tandem drive configurations, plus 30% extended casing life.
-              </p>
-
-              <a className="button" href="#book-alignment" style={{ width: "100%", justifyContent: "center", fontSize: 14 }}>
-                Book Your Fleet Alignment Audit ↗
-              </a>
-            </div>
-          </div>
+          <AlignmentCalculator />
         </div>
       </section>
 

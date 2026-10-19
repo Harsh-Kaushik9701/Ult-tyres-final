@@ -31,39 +31,61 @@ Next.js 16 App Router enterprise web application for **Ultimate Tyres Australia*
 - A MongoDB cluster or database (e.g. free tier on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas))
 
 ### 2. Environment Configuration
-Copy `.env.example` to `.env.local`:
+Copy `.env.example` to `.env.local` and fill it in:
 ```bash
 cp .env.example .env.local
 ```
+Key variables:
+- `NEXT_PUBLIC_SITE_URL` – the live domain (used for canonical URLs, `og:url`, `og:image`, sitemap). Use `http://localhost:3000` locally.
+- `SESSION_SECRET` – **required in production** (48+ random characters):
+  `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`
+- `MONGODB_URI` – optional for local testing; without it (or with no internet) the site uses its built-in catalogue and locations.
+- `ENABLE_DEMO_LOGIN=true` – local-only demo logins (ignored in production builds).
 
-Configure your environment variables:
-```env
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
-MONGODB_DB=ultimate_tyres
-SESSION_SECRET=your-random-32-character-session-secret-key
-NEXT_PUBLIC_PHONE=1300 110 002
-NEXT_PUBLIC_WHATSAPP=61482094850
-BOOTSTRAP_ADMIN_EMAIL=admin@ultimatetyres.com.au
-BOOTSTRAP_ADMIN_PASSWORD=your-secure-admin-password
-```
-
-### 3. Install Dependencies & Build
+### 3. Run on localhost (works offline)
 ```bash
-npm install
+npm install          # once, needs internet
+npm run dev          # http://localhost:3000
+```
+No fonts, images, scripts or APIs are loaded from the internet, so every page renders on localhost with the network off. With `ENABLE_DEMO_LOGIN=true` in `.env.local` you can sign in with `dealer@ultimatetyres.com.au / dealer123` or `admin@ultimatetyres.com.au / admin123` (dev server only).
+
+To test the production build locally:
+```bash
 npm run build
+SESSION_SECRET=<random-48-chars> npm start
 ```
 
 ### 4. Seed Database (Optional)
-To initialize collections, indexes, initial workshop locations, product catalogue, and the default admin account in your MongoDB:
 ```bash
 npm run db:setup
 ```
+Creates collections, indexes, locations and the product catalogue. An admin account is created only when `BOOTSTRAP_ADMIN_EMAIL` and a `BOOTSTRAP_ADMIN_PASSWORD` of 12+ characters are set. A demo dealer is created only with `SEED_DEMO_DEALER=true` (remove it before going live).
 
-### 5. Run Locally
-```bash
-npm run dev
-```
-Visit [http://localhost:3000](http://localhost:3000) to view the application.
+---
+
+## Server-side rendering
+
+All public pages (Home, About, Services, Wheel Alignment, Insights and articles, products, network) are React **Server Components rendered on the server for every request**. The browser receives complete HTML, including titles, content and meta tags. Only small interactive parts run in the browser:
+- `components/site-client.tsx` – header menu, home hero carousel, enquiry form
+- `components/alignment-calculator.tsx` – savings calculator
+- existing catalogue filter, network map and dealer portal widgets
+
+## SEO
+
+- Per-page meta title, description, keywords, canonical URL, Open Graph (`og:title`, `og:description`, `og:url`, `og:image`) and Twitter card tags via `buildMetadata()` in `lib/seo.ts`.
+- Copy for each page lives in `lib/page-seo.ts` – edit there.
+- Default `og:image`: `public/images/og-ultimate-tyres.jpg` (1200×630). Each service and Insights article gets its own branded image generated on the server (`opengraph-image.tsx`); products use the product photo.
+- JSON-LD structured data (Organization, BreadcrumbList, Service, BlogPosting), `robots.txt` and `sitemap.xml` use `NEXT_PUBLIC_SITE_URL`.
+
+## Security
+
+- `proxy.ts`: strict Content-Security-Policy with a per-request nonce; cross-site POST/PATCH to `/api/*` is blocked (CSRF).
+- `next.config.ts`: HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP/CORP.
+- Login: no hard-coded/back-door accounts, bcrypt with timing-safe handling, rate limiting (per IP and per account), `HttpOnly` + `SameSite=Strict` cookie (`Secure` over HTTPS).
+- Sessions are re-checked against MongoDB on every protected request, so deactivated accounts lose access immediately.
+- API input is size-limited, type-checked and sanitised (no NoSQL operator injection); order prices come from the server.
+- Wholesale prices and stock are never sent to public pages.
+- Rate limiting is in-memory per server instance; for multi-instance/serverless hosting add a shared store (e.g. Redis).
 
 ---
 
@@ -74,7 +96,8 @@ Visit [http://localhost:3000](http://localhost:3000) to view the application.
 3. In the **Environment Variables** section, add:
    - `MONGODB_URI`: Your MongoDB Atlas connection URI.
    - `MONGODB_DB`: `ultimate_tyres`
-   - `SESSION_SECRET`: A secure random string (at least 32 characters).
+   - `SESSION_SECRET`: A secure random string (at least 32 characters) – required.
+   - `NEXT_PUBLIC_SITE_URL`: `https://ultimatetyres.com.au`
    - `NEXT_PUBLIC_PHONE`: `1300 110 002`
    - `NEXT_PUBLIC_WHATSAPP`: `61482094850`
 4. Click **Deploy**. Vercel will automatically build and launch your application globally on its high-speed edge CDN.

@@ -67,3 +67,26 @@ export async function getProduct(id: number): Promise<ProductRecord | null> {
   const products = await getProducts();
   return products.find((product) => product.id === id) || null;
 }
+
+/**
+ * Only the fields that are safe to publish. Public pages pass products to a
+ * client component, which serialises its props into the page, so wholesale
+ * prices and stock levels must be removed first.
+ */
+export function toPublicProduct(p: ProductRecord) {
+  return {
+    id: p.id,
+    brand: p.brand,
+    application: p.application,
+    pattern: p.pattern,
+    size: p.size,
+    plyRating: p.plyRating,
+    loadSpeed: p.loadSpeed,
+    treadDepthMm: p.treadDepthMm,
+    image: p.image
+  };
+}
+
+export async function getPublicProducts() {
+  return (await getProducts()).map(toPublicProduct);
+}

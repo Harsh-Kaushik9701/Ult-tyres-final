@@ -1,10 +1,13 @@
 import { getDb, isMongoConfigured } from "@/lib/db";
 import { DealerProductCatalog } from "@/components/portal";
-import { currentSession } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { getVerifiedSession } from "@/lib/auth";
 import { allCatalogueProducts } from "@/lib/catalogue-data";
 
 export default async function PortalProducts() {
-  const session = await currentSession();
+  // Checked here as well as in the layout: pages and layouts render independently.
+  const session = await getVerifiedSession("dealer");
+  if (!session) redirect("/dealers/login");
   let products: any[] = [];
 
   try {

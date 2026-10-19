@@ -2,17 +2,27 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { PageHero, ContactBand } from "@/components/site";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbSchema, buildMetadata } from "@/lib/seo";
+import { staticPageSeo } from "@/lib/page-seo";
 
-export const metadata: Metadata = {
-  title: "About Us · Brand History, Facilities & Fleet Mission",
-  description:
-    "Learn about Ultimate Tyres Australia, our commercial tyre engineering heritage, national warehouse facilities in Rocklea, and our mission as The Dependable Co-Pilot for Australian fleets."
-};
+export const metadata: Metadata = buildMetadata({
+  ...staticPageSeo.about,
+  path: "/about",
+  image: { url: "/images/og-ultimate-tyres.jpg", alt: "About Ultimate Tyres Australia" }
+});
 
 export default function AboutPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "About Us", path: "/about" }
+        ])}
+      />
       <PageHero
+        crumb="About Us"
         eyebrow="The Dependable Co-Pilot · About Ultimate Tyres"
         title="The Ultimate Foundation for Every Journey."
         intro="In the commercial transport sector, downtime is the enemy. Ultimate Tyres provides unwavering reliability, industrial strength, and operational efficiency for Australian heavy fleets and tyre dealers."
@@ -112,7 +122,7 @@ export default function AboutPage() {
               <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6 }}>
                 Located at 5 Permarig Place, Rocklea QLD. Over 5,000 sqm of covered high-bay tyre warehousing holding 45,000+ commercial truck and bus radials in stock for immediate dispatch.
               </p>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>✓ Rocklea Freight Hub Hub</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>✓ Rocklea Freight Hub</span>
             </div>
 
             <div style={{ background: "#f8faf9", border: "1px solid var(--line)", borderRadius: 8, padding: 28 }}>

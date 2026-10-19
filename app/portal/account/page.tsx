@@ -1,9 +1,13 @@
-import { currentSession } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { getVerifiedSession } from "@/lib/auth";
 import { getDb, isMongoConfigured } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import Link from "next/link";
 
 export default async function PortalAccount() {
-  const session = await currentSession();
+  // Checked here as well as in the layout: pages and layouts render independently.
+  const session = await getVerifiedSession("dealer");
+  if (!session) redirect("/dealers/login");
   let dealer: any = {
     business_name: "Queensland Transport Tyres Pty Ltd",
     abn: "45 109 874 321",
@@ -19,10 +23,9 @@ export default async function PortalAccount() {
   try {
     if (isMongoConfigured()) {
       const db = await getDb();
-      const filter: any = session?.dealerId
-        ? { $or: [{ id: session.dealerId }, { accountId: session.dealerId }, { email: session?.email }] }
-        : { email: session?.email };
-      const d = await db.collection("dealers").findOne(filter);
+      const d = ObjectId.isValid(session.dealerId!)
+        ? await db.collection("dealers").findOne({ _id: new ObjectId(session.dealerId) })
+        : null;
       if (d) {
         dealer = {
           ...dealer,

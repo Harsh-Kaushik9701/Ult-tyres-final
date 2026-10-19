@@ -319,7 +319,7 @@ h3 { font-size:30px; }
 .footer { padding:64px 0 20px; background:#000000; color:#d9d9d9; border-top:1px solid #1a1a1a; }
 .footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:50px; padding-bottom:48px; }
 .footer-about p { max-width:290px; margin-top:17px; color:#bfbfbf; font-size:12px; }
-.footer h4 { margin:0 0 17px; color:#fff; font:800 17px var(--display); text-transform:uppercase; letter-spacing:.05em; }
+.footer h4, .footer .footer-heading { margin:0 0 17px; line-height:1.2; color:#fff; font:800 17px var(--display); text-transform:uppercase; letter-spacing:.05em; }
 .footer-links { display:grid; gap:10px; color:#bfbfbf; font-size:12px; }
 .footer-links a:hover { color:var(--yellow); }
 .footer-bottom { display:flex; align-items:center; justify-content:space-between; gap:20px; border-top:1px solid #1a1a1a; padding-top:18px; color:#8e9290; font-size:10.5px; }
@@ -637,4 +637,18 @@ th { background:#f7f7f7; font-size:9.5px; text-transform:uppercase; letter-spaci
 
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+
+/* ---- Added: server-rendered nav menus are hidden until opened ---- */
+.nav-dropdown:not(.open) > .nav-menu { display:none; }
+/* Skip link for keyboard users */
+.skip-link { position:absolute; left:-10000px; top:0; z-index:100; padding:10px 14px; background:var(--yellow); color:#000; font-weight:700; }
+.skip-link:focus { left:12px; top:12px; }
+/* Article body (Insights) */
+.article-body h2 { font-size:28px; margin:32px 0 16px; color:var(--ink); }
+.article-body p { margin:16px 0; color:#374151; }
+.article-body ol, .article-body ul { margin:16px 0; padding-left:22px; }
+.article-body li { margin:8px 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
 }

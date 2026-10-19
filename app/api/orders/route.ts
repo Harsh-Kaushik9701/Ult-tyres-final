@@ -1,66 +1,83 @@
 import { NextResponse } from "next/server";
-import { currentSession } from "@/lib/session";
+import { randomInt } from "node:crypto";
+import { getVerifiedSession } from "@/lib/auth";
 import { getDb, isMongoConfigured } from "@/lib/db";
+import { getProducts } from "@/lib/products";
+import { rateLimit } from "@/lib/rate-limit";
+import { BadRequest, cleanText, forbiddenCrossSite, isSameOrigin, jsonError, readJsonBody, str } from "@/lib/security";
 
 export async function POST(request: Request) {
-  const session = await currentSession();
-  if (!session || session.role !== "dealer") {
-    return NextResponse.json({ error: "Please sign in with an approved dealer account to place an order." }, { status: 401 });
-  }
+  if (!isSameOrigin(request)) return forbiddenCrossSite();
 
+  const session = await getVerifiedSession("dealer");
+  if (!session) return jsonError("Please sign in with an approved dealer account to place an order.", 401);
+
+  const limit = rateLimit(`orders:${session.id}`, 30, 10 * 60_000);
+  if (!limit.ok) return jsonError("Too many orders in a short time. Please wait a moment.", 429);
+
+  let body: Record<string, unknown>;
   try {
-    const body = await request.json();
-    const input = Array.isArray(body.items) ? body.items : [];
-    const items = input
-      .map((x: any) => ({ productId: Number(x.productId), quantity: Number(x.quantity) }))
-      .filter((x: any) => Number.isInteger(x.productId) && Number.isInteger(x.quantity) && x.quantity > 0 && x.quantity <= 10000);
-
-    if (!items.length || items.length > 100) {
-      return NextResponse.json({ error: "Choose at least one valid product and quantity." }, { status: 400 });
-    }
-
-    const orderRef = "UT-" + Math.floor(100000 + Math.random() * 900000);
-
-    // Save to MongoDB if configured
-    try {
-      if (isMongoConfigured()) {
-        const db = await getDb();
-        await db.collection("orders").insertOne({
-          orderId: orderRef,
-          dealerId: session.dealerId || "dealer-hub-01",
-          dealerEmail: session.email,
-          status: "submitted",
-          items,
-          poNumber: body.poNumber || null,
-          deliveryNotes: body.deliveryNotes || null,
-          createdAt: new Date()
-        });
-
-        return NextResponse.json(
-          {
-            message: `Order #${orderRef} submitted to MongoDB! Priority dispatch is being arranged.`,
-            orderId: orderRef
-          },
-          { status: 201 }
-        );
-      }
-    } catch (dbErr) {
-      console.warn("MongoDB order insert bypassed, using fallback confirmation", dbErr);
-    }
-
-    // Graceful reliable order confirmation
-    return NextResponse.json(
-      {
-        message: `Order #${orderRef} submitted successfully! Your account manager has received your ${items.reduce(
-          (s: number, i: any) => s + i.quantity,
-          0
-        )} tyres and will confirm dispatch today.`,
-        orderId: orderRef
-      },
-      { status: 201 }
-    );
+    body = await readJsonBody(request, 32 * 1024);
   } catch (error) {
-    console.error("order submission failed", error);
-    return NextResponse.json({ error: "Unable to submit the order right now. Please try again." }, { status: 500 });
+    if (error instanceof BadRequest) return jsonError("Choose at least one valid product and quantity.", 400);
+    throw error;
   }
+
+  const input = Array.isArray(body.items) ? body.items.slice(0, 101) : [];
+  if (!input.length || input.length > 100) return jsonError("Choose between 1 and 100 order lines.", 400);
+
+  // Only products that really exist in the catalogue can be ordered. Prices are
+  // taken from the server, never from the browser.
+  const catalogue = new Map((await getProducts()).map((p) => [String(p.id), p]));
+  const items: { productId: string | number; quantity: number; brand: string; pattern: string; size: string; unitPrice: number | null }[] = [];
+  for (const raw of input) {
+    if (!raw || typeof raw !== "object") return jsonError("Choose at least one valid product and quantity.", 400);
+    const line = raw as Record<string, unknown>;
+    const quantity = Number(line.quantity);
+    const product = catalogue.get(str(line.productId, 40));
+    if (!product || !Number.isInteger(quantity) || quantity < 1 || quantity > 10_000) {
+      return jsonError("One of the products or quantities isn’t valid.", 400);
+    }
+    items.push({
+      productId: product.id,
+      quantity,
+      brand: product.brand,
+      pattern: product.pattern,
+      size: product.size,
+      unitPrice: typeof product.wholesalePrice === "number" ? product.wholesalePrice : null
+    });
+  }
+
+  const orderRef = "UT-" + randomInt(100000, 1000000);
+  const totalUnits = items.reduce((sum, i) => sum + i.quantity, 0);
+  const order = {
+    orderId: orderRef,
+    dealerId: session.dealerId,
+    dealerEmail: session.email,
+    status: "submitted",
+    items,
+    poNumber: cleanText(body.poNumber, 60) || null,
+    deliveryNotes: cleanText(body.deliveryNotes, 1000) || null,
+    createdAt: new Date()
+  };
+
+  if (isMongoConfigured() && !session.demo) {
+    try {
+      const db = await getDb();
+      await db.collection("orders").insertOne(order);
+    } catch (error) {
+      console.error("order submission failed", error);
+      return jsonError("Unable to submit the order right now. Please try again or call your account manager.", 503);
+    }
+  } else {
+    console.info(`[demo] order ${orderRef} accepted (${totalUnits} tyres) – not stored`);
+  }
+
+  return NextResponse.json(
+    {
+      message: `Order #${orderRef} submitted. Your account manager has received your ${totalUnits} tyres and will confirm dispatch.`,
+      orderId: orderRef
+    },
+    { status: 201 }
+  );
 }

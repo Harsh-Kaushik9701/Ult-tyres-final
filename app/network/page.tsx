@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { getDb, isMongoConfigured } from "@/lib/db";
 import { PageHero, ContactBand } from "@/components/site";
 import { NetworkLocator, NetworkLocation } from "@/components/locator";
 import { locations as knownLocations } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Interactive Dealer & Service Network Map Australia",
-  description:
-    "Find your nearest Ultimate Tyres dealer, heavy truck alignment center, and wholesale distribution depot across Australia. Rocklea, Eastern Creek, Laverton, Wingfield, and Kewdale."
-};
-
+export const metadata: Metadata = buildMetadata({
+  title: "Dealer & Service Network Map – Australia",
+  description: "Find your nearest Ultimate Tyres dealer, heavy truck alignment centre and distribution depot across Australia: Rocklea, Eastern Creek, Laverton, Wingfield and Kewdale.",
+  keywords: ["truck tyre dealer near me", "tyre service network Australia", "truck alignment near me", "Ultimate Tyres locations"],
+  path: "/network"
+});
 export const dynamic = "force-dynamic";
 
 export default async function NetworkPage() {

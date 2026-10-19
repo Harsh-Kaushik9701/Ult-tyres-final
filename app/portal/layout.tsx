@@ -1,26 +1,24 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { currentSession } from "@/lib/session";
+import { getVerifiedSession } from "@/lib/auth";
 import { PortalNav, SignOut } from "@/components/portal";
 import { getDb, isMongoConfigured } from "@/lib/db";
+import { ObjectId } from "mongodb";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
-  const session = await currentSession();
-  if (!session || session.role !== "dealer" || !session.dealerId) {
-    redirect("/dealers/login");
-  }
+  const session = await getVerifiedSession("dealer");
+  if (!session) redirect("/dealers/login");
 
   let company = "Dealer Account";
   try {
     if (isMongoConfigured()) {
       const db = await getDb();
-      const filter: any = session.dealerId
-        ? { $or: [{ id: session.dealerId }, { accountId: session.dealerId }, { email: session.email }] }
-        : { email: session.email };
-      const d = await db.collection("dealers").findOne(filter);
+      const d = ObjectId.isValid(session.dealerId!)
+        ? await db.collection("dealers").findOne({ _id: new ObjectId(session.dealerId) })
+        : null;
       if (d?.business_name || d?.businessName) {
         company = d.business_name || d.businessName;
       }

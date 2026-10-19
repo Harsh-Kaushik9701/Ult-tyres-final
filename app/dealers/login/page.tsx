@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHero } from "@/components/site";
 import { LoginForm } from "@/components/catalog";
+import { demoLoginEnabled } from "@/lib/auth";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Authorised Dealer Login",
-  description: "Sign in to the Ultimate Tyres dealer portal for live wholesale tyre pricing, rapid SKU ordering, inventory and order fulfillment."
-};
+  description:
+    "Sign in to the Ultimate Tyres dealer portal for live wholesale tyre pricing, rapid SKU ordering, inventory and order fulfilment.",
+  keywords: ["tyre dealer portal", "wholesale tyre ordering"],
+  path: "/dealers/login",
+  noIndex: true
+});
 
 export default function DealerLoginPage() {
   return (
@@ -18,7 +24,7 @@ export default function DealerLoginPage() {
       />
       <section className="section">
         <div className="container content-layout">
-          <LoginForm />
+          <LoginForm demo={demoLoginEnabled()} />
           <aside className="side-panel">
             <h3>Portal Features</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 14, fontSize: 13, lineHeight: 1.5 }}>

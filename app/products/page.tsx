@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { ProductCatalog } from "@/components/catalog";
 import { PageHero } from "@/components/site";
-import { getProducts } from "@/lib/products";
+import { getPublicProducts } from "@/lib/products";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Commercial Tyre Range · Ralson, Blacklion & Triangle",
-  description:
-    "Explore the complete range of heavy commercial truck and bus radial tyres distributed by Ultimate Tyres across Australia. Featuring Ralson, Blacklion, and Triangle.",
-  keywords: ["truck tyres", "bus tyres", "commercial tyre range", "Ralson Australia", "Blacklion tyres", "Triangle tyres"]
-};
-
+export const metadata: Metadata = buildMetadata({
+  title: "Commercial Tyre Range – Ralson, Blacklion & Triangle",
+  description: "Explore heavy commercial truck and bus radial tyres distributed by Ultimate Tyres across Australia, featuring Ralson, Blacklion and Triangle specifications.",
+  keywords: ["truck tyres", "bus tyres", "commercial tyre range", "Ralson Australia", "Blacklion tyres", "Triangle tyres"],
+  path: "/products"
+});
 export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
-  const products = await getProducts();
+  const products = await getPublicProducts();
   return (
     <>
       <PageHero
@@ -47,7 +47,7 @@ export default async function ProductsPage() {
               Dealer Wholesale Login ↗
             </Link>
           </div>
-          <ProductCatalog products={products as any} />
+          <ProductCatalog products={products} />
         </div>
       </section>
     </>
