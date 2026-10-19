@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { services } from "@/lib/content";
 import { siteConfig, telHref, whatsappHref } from "@/lib/site-config";
+import { branchAddress, branches, directionsUrl } from "@/lib/branches";
 import { HeaderNav, HeroCarousel as HeroCarouselClient, type HeroBanner, type NavEntry } from "@/components/site-client";
 
 export { LeadForm } from "@/components/site-client";
@@ -204,7 +205,12 @@ export function Footer() {
               <a href={whatsappHref()} target="_blank" rel="noopener noreferrer">
                 WhatsApp · {waDisplay}
               </a>
-              <span>Headquarters · 5 Permarig Pl, Rocklea QLD</span>
+              {branches.map((b) => (
+                <a key={b.id} href={directionsUrl(b)} target="_blank" rel="noopener noreferrer">
+                  {b.name}
+                  {b.note ? ` (${b.note.toLowerCase()})` : ""} · {branchAddress(b)}
+                </a>
+              ))}
               <Link href="/news">Fleet Insights</Link>
               <Link href="/network">Interactive Network Map</Link>
               <Link href="/dealers/login">Wholesale Dealer Portal</Link>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { articles, services } from "@/lib/content";
 import { ContactBand, HeroCarousel, SectionTitle } from "@/components/site";
 import { JsonLd } from "@/components/json-ld";
+import { BranchesSection } from "@/components/branches";
 import { buildMetadata, organizationSchema } from "@/lib/seo";
 import { staticPageSeo } from "@/lib/page-seo";
 import { siteConfig } from "@/lib/site-config";
@@ -326,44 +327,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Interactive Network Map Callout */}
-      <section className="section section-dark section-tight">
-        <div className="container feature-split">
-          <div className="feature-copy">
-            <div className="eyebrow" style={{ color: "var(--yellow)" }}>Strategic Australian Network</div>
-            <h2>Australia, in Motion.<br />Closer to Your Route.</h2>
-            <p style={{ color: "#d1d5db" }}>
-              Explore our interactive dealer and service network across Queensland, New South Wales, Victoria, South Australia, and Western Australia. Connect directly with heavy alignment bays and mobile fitting units.
-            </p>
-            <div style={{ marginTop: 20 }}>
-              <Link className="button" href="/network">
-                Open Interactive Network Map ↗
-              </Link>
-            </div>
-          </div>
-          <div className="feature-media">
-            <div
-              style={{
-                height: "100%",
-                minHeight: 280,
-                display: "grid",
-                placeItems: "center",
-                color: "#fff",
-                fontFamily: "var(--display)",
-                fontSize: 32,
-                textTransform: "uppercase",
-                letterSpacing: ".05em",
-                background: "linear-gradient(145deg, #181c1c, #0f1212)",
-                borderRadius: 10,
-                border: "1px solid #2d3333"
-              }}
-            >
-              11 National Hubs
-            </div>
-            <span className="media-label">Rocklea · Eastern Creek · Laverton · Wingfield · Kewdale</span>
-          </div>
-        </div>
-      </section>
+      {/* Branches + Google map */}
+      <BranchesSection />
 
       <ContactBand />
     </>

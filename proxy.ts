@@ -35,6 +35,8 @@ function buildCsp(nonce: string, { dev, https }: { dev: boolean; https: boolean 
     "img-src 'self' blob: data:",
     "font-src 'self' data:",
     "media-src 'self'",
+    // Google Maps embed for the branches map (components/branch-map.tsx).
+    "frame-src https://www.google.com https://maps.google.com",
     `connect-src 'self'${dev ? " ws: wss:" : ""}`,
     "worker-src 'self' blob:",
     "manifest-src 'self'",

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PageHero, ContactBand } from "@/components/site";
 import { JsonLd } from "@/components/json-ld";
+import { BranchesSection } from "@/components/branches";
 import { breadcrumbSchema, buildMetadata } from "@/lib/seo";
 import { staticPageSeo } from "@/lib/page-seo";
 
@@ -181,6 +182,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <BranchesSection />
 
       <ContactBand />
     </>

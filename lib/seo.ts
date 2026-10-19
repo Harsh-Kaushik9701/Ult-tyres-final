@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { absoluteUrl, siteConfig } from "@/lib/site-config";
+import { branches, directionsUrl } from "@/lib/branches";
 
 export type SeoImage = { url: string; width?: number; height?: number; alt?: string };
 
@@ -100,7 +101,21 @@ export function organizationSchema() {
       postalCode: siteConfig.address.postcode,
       addressCountry: siteConfig.address.country
     },
-    areaServed: { "@type": "Country", name: "Australia" }
+    areaServed: { "@type": "Country", name: "Australia" },
+    department: branches.map((b) => ({
+      "@type": "AutoRepair",
+      name: `${siteConfig.name} ${b.name}`,
+      telephone: siteConfig.phone,
+      hasMap: directionsUrl(b),
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: b.street,
+        addressLocality: b.suburb,
+        addressRegion: b.state,
+        postalCode: b.postcode,
+        addressCountry: "AU"
+      }
+    }))
   };
 }
 

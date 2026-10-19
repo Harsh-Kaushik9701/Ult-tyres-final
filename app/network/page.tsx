@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { getDb, isMongoConfigured } from "@/lib/db";
 import { PageHero, ContactBand } from "@/components/site";
+import { BranchesSection } from "@/components/branches";
 import { NetworkLocator, NetworkLocation } from "@/components/locator";
 import { locations as knownLocations } from "@/lib/content";
 
@@ -54,6 +55,7 @@ export default async function NetworkPage() {
         title="Find Local Support. Wherever You Work."
         intro="While the geography of Australia is vast, our national network map and distribution channels make us local. Connect with Ultimate Tyres wholesale distribution depots, heavy truck wheel alignment bays, and mobile fitting specialists across QLD, NSW, VIC, SA, and WA."
       />
+      <BranchesSection showAllLink={false} />
       <section className="section">
         <div className="container">
           <NetworkLocator locations={locations} />
