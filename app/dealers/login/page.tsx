@@ -50,7 +50,7 @@ export default function DealerLoginPage() {
                 <strong style={{ display: "block", color: "var(--ink)", marginBottom: 2 }}>
                   4. Real-Time Order History & Tracking
                 </strong>
-                <span>Track dispatch status from Rocklea, Eastern Creek, and Laverton national distribution centers.</span>
+                <span>Track dispatch status from our Rocklea head office, Yatala and Bald Hills branches.</span>
               </div>
             </div>
 

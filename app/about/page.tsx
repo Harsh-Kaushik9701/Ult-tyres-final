@@ -66,7 +66,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Brand Pillars: Profitability through Durability, Frictionless Wholesale, Nationwide Backbone */}
+      {/* Brand Pillars: Profitability through Durability, Frictionless Wholesale, Local Branches */}
       <section className="section section-dark">
         <div className="container">
           <div style={{ maxWidth: 760, margin: "0 auto 40px", textAlign: "center" }}>
@@ -96,9 +96,9 @@ export default function AboutPage() {
 
             <div className="service-card">
               <span className="service-no">03</span>
-              <h3>Nationwide Logistics Backbone</h3>
+              <h3>Local Branches, Mobile Vans</h3>
               <p>
-                While the geography of Australia is vast, our network map and distribution channels make us local. Rapid overnight hot-shot freight connects capital cities and remote regional freight corridors.
+                Three branches across South East Queensland – Rocklea, Yatala and Bald Hills – plus mobile service vans that come to your yard. One number gets you all of them.
               </p>
             </div>
           </div>

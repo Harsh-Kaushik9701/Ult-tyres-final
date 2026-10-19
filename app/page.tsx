@@ -31,7 +31,7 @@ export default function HomePage() {
         <div className="container trust-grid">
           {[
             ["01", "Commercial Tyre Expertise", "Heavy radials matched to Australian routes"],
-            ["02", "Nationwide Logistics Hub", "Rocklea, Eastern Creek & Laverton depots"],
+            ["02", "Three Branches, One Number", "Rocklea, Yatala & Bald Hills + mobile vans"],
             ["03", "Precision Wheel Alignment", "Computerised laser bays cut fuel & wear"],
             ["04", "Frictionless Dealer Portal", "Live warehouse stock & rapid trade orders"]
           ].map(([n, t, s]) => (
@@ -254,7 +254,7 @@ export default function HomePage() {
               </div>
               <h3 style={{ fontSize: 24, margin: "0 0 10px" }}>Rapid Wholesale Ordering</h3>
               <p style={{ fontSize: 13, color: "#9ca3af", lineHeight: 1.6, margin: "0 0 20px" }}>
-                Designed specifically for mobile devices. Check live Rocklea and Eastern Creek warehouse stock, wholesale trade pricing, and place rapid SKU orders directly from your phone while standing under a truck.
+                Designed specifically for mobile devices. Check live warehouse stock, wholesale trade pricing, and place rapid SKU orders directly from your phone while standing under a truck.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, fontSize: 12, marginBottom: 20 }}>
                 <div style={{ background: "#202525", padding: "10px 12px", borderRadius: 6 }}>

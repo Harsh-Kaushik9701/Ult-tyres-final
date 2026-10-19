@@ -1,13 +1,13 @@
 # Ultimate Tyres Australia — Commercial Fleet & Tyre Distribution Platform
 
-Next.js 16 App Router enterprise web application for **Ultimate Tyres Australia**, featuring high-performance commercial tyre distribution, interactive Australian dealer & fitment network locator, comprehensive fleet service pages, and an authorized B2B wholesale dealer portal backed by **MongoDB**.
+Next.js 16 App Router enterprise web application for **Ultimate Tyres Australia**, featuring high-performance commercial tyre distribution, branch finder with Google Maps, comprehensive fleet service pages, and an authorized B2B wholesale dealer portal backed by **MongoDB**.
 
 ---
 
 ## Key Features
 
 - **Commercial Tyre Distribution**: Comprehensive tyre ranges across **Ralson**, **Blacklion**, and **Triangle**.
-- **Interactive Australian Service Network**: Real-time state-filtered interactive map and workshop locator with emergency roadside callouts and capability badges.
+- **Branches & Map**: Rocklea (head office), Yatala and Bald Hills with an embedded Google map, directions and services. Branch details live in `lib/branches.ts`.
 - **Wholesale Dealer Portal**: Protected B2B portal with SKU rapid order booking, live wholesale pricing tiers, order status tracking, and account management.
 - **Resilient MongoDB Database Integration**: Cached connection pooling optimized for serverless edge and Vercel deployments. Graceful local dataset fallbacks if MongoDB URI is pending.
 - **Operations & Admin Management**: Review and approve dealer onboarding applications, update inventory stock, and manage dispatch locations.
@@ -47,7 +47,7 @@ Key variables:
 npm install          # once, needs internet
 npm run dev          # http://localhost:3000
 ```
-No fonts, images, scripts or APIs are loaded from the internet, so every page renders on localhost with the network off. With `ENABLE_DEMO_LOGIN=true` in `.env.local` you can sign in with `dealer@ultimatetyres.com.au / dealer123` or `admin@ultimatetyres.com.au / admin123` (dev server only).
+No fonts, images or scripts are loaded from the internet, so every page renders on localhost with the network off (the embedded Google map is the only online part; offline it shows the branch address instead). With `ENABLE_DEMO_LOGIN=true` in `.env.local` you can sign in with `dealer@ultimatetyres.com.au / dealer123` or `admin@ultimatetyres.com.au / admin123` (dev server only).
 
 To test the production build locally:
 ```bash
@@ -68,7 +68,8 @@ Creates collections, indexes, locations and the product catalogue. An admin acco
 All public pages (Home, About, Services, Wheel Alignment, Insights and articles, products, network) are React **Server Components rendered on the server for every request**. The browser receives complete HTML, including titles, content and meta tags. Only small interactive parts run in the browser:
 - `components/site-client.tsx` – header menu, home hero carousel, enquiry form
 - `components/alignment-calculator.tsx` – savings calculator
-- existing catalogue filter, network map and dealer portal widgets
+- `components/branch-map.tsx` – switching the Google map between branches
+- existing catalogue filter and dealer portal widgets
 
 ## SEO
 

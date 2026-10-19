@@ -80,7 +80,7 @@ export default async function PortalHome() {
           </Link>
         </div>
         <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6 }}>
-          Direct wholesale access to the complete <strong>Ralson</strong>, <strong>Blacklion</strong>, and <strong>Triangle</strong> commercial truck and bus radials. Check live warehouse stock across Rocklea, Eastern Creek, and Laverton depots with your account tier pricing.
+          Direct wholesale access to the complete <strong>Ralson</strong>, <strong>Blacklion</strong>, and <strong>Triangle</strong> commercial truck and bus radials. Check live warehouse stock with your account tier pricing.
         </p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
           <Link className="button button-outline" href="/portal/products?brand=Ralson">Ralson Range</Link>

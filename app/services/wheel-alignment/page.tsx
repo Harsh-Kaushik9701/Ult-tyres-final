@@ -223,7 +223,7 @@ export default function WheelAlignmentPage() {
             <div className="eyebrow">Fleet Booking Enquiry</div>
             <h2>Schedule a Wheel Alignment Audit for Your Vehicles</h2>
             <p>
-              Whether you operate a single prime mover or manage a multi-state distribution fleet, our Rocklea, Eastern Creek, and Laverton heavy alignment bays accommodate rigids, semi-trailers, B-doubles, and road trains.
+              Whether you operate a single prime mover or manage a large distribution fleet, our heavy alignment bays accommodate rigids, semi-trailers, B-doubles, and road trains.
             </p>
             <div style={{ marginTop: 24 }}>
               <Link className="button" href="/contact?topic=alignment">

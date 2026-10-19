@@ -13,6 +13,9 @@ export type Branch = {
   postcode: string;
   /** What Google Maps should search for – the business listing name plus address. */
   mapsQuery: string;
+  latitude: number;
+  longitude: number;
+  services: string[];
 };
 
 export const branches: Branch[] = [
@@ -24,7 +27,10 @@ export const branches: Branch[] = [
     suburb: "Rocklea",
     state: "QLD",
     postcode: "4106",
-    mapsQuery: "Ultimate Tyre Services (24/7 Mobile service), 5 Permarig Pl, Rocklea QLD 4106, Australia"
+    mapsQuery: "Ultimate Tyre Services (24/7 Mobile service), 5 Permarig Pl, Rocklea QLD 4106, Australia",
+    latitude: -27.5486,
+    longitude: 153.0037,
+    services: ["Tyre fitting", "Wheel alignment", "Wheel balancing", "Mobile service"]
   },
   {
     id: "yatala",
@@ -33,7 +39,10 @@ export const branches: Branch[] = [
     suburb: "Yatala",
     state: "QLD",
     postcode: "4207",
-    mapsQuery: "Ultimate Tyre Services, 4 Ozkleen Pl, Yatala QLD 4207, Australia"
+    mapsQuery: "Ultimate Tyre Services, 4 Ozkleen Pl, Yatala QLD 4207, Australia",
+    latitude: -27.7366,
+    longitude: 153.2208,
+    services: ["Tyre fitting", "Wheel balancing", "Mobile service"]
   },
   {
     id: "bald-hills",
@@ -42,7 +51,10 @@ export const branches: Branch[] = [
     suburb: "Bald Hills",
     state: "QLD",
     postcode: "4036",
-    mapsQuery: "Ultimate Tyre Services, 79 Linkfield Rd, Bald Hills QLD 4036, Australia"
+    mapsQuery: "Ultimate Tyre Services, 79 Linkfield Rd, Bald Hills QLD 4036, Australia",
+    latitude: -27.3131,
+    longitude: 153.0127,
+    services: ["Tyre fitting", "Puncture repair", "Mobile service"]
   }
 ];
 
@@ -65,3 +77,17 @@ export function mapEmbedUrl(b: Branch) {
 export function directionsUrl(b: Branch) {
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(b.mapsQuery)}`;
 }
+
+/** Same branches in the shape used by /api/locations and the admin screen. */
+export const branchLocations = branches.map((b) => ({
+  id: b.id,
+  name: `Ultimate Tyres ${b.name}`,
+  address: b.street,
+  suburb: b.suburb,
+  state: b.state,
+  postcode: b.postcode,
+  phone: "1300 110 002",
+  latitude: b.latitude,
+  longitude: b.longitude,
+  capabilities: b.services
+}));

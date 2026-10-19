@@ -1,64 +1,69 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { getDb, isMongoConfigured } from "@/lib/db";
 import { PageHero, ContactBand } from "@/components/site";
 import { BranchesSection } from "@/components/branches";
-import { NetworkLocator, NetworkLocation } from "@/components/locator";
-import { locations as knownLocations } from "@/lib/content";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbSchema } from "@/lib/seo";
+import { branchAddress, branches, directionsUrl } from "@/lib/branches";
+import { siteConfig, telHref } from "@/lib/site-config";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Dealer & Service Network Map – Australia",
-  description: "Find your nearest Ultimate Tyres dealer, heavy truck alignment centre and distribution depot across Australia: Rocklea, Eastern Creek, Laverton, Wingfield and Kewdale.",
-  keywords: ["truck tyre dealer near me", "tyre service network Australia", "truck alignment near me", "Ultimate Tyres locations"],
+  title: "Find a Branch – Rocklea, Yatala & Bald Hills",
+  description:
+    "Ultimate Tyres branches at Rocklea (head office), Yatala and Bald Hills in South East Queensland, plus mobile service vans. Directions, services and one number: 1300 110 002.",
+  keywords: [
+    "tyre shop Rocklea",
+    "truck tyres Yatala",
+    "truck tyres Bald Hills",
+    "mobile truck tyre service Brisbane",
+    "truck tyres near me"
+  ],
   path: "/network"
 });
-export const dynamic = "force-dynamic";
 
-export default async function NetworkPage() {
-  let locations: NetworkLocation[] = knownLocations;
-
-  try {
-    if (isMongoConfigured()) {
-      const db = await getDb();
-      const docs = await db.collection("locations").find({ active: { $ne: false } }).sort({ state: 1, suburb: 1 }).toArray();
-      if (docs && docs.length > 0) {
-        const dbLocations: NetworkLocation[] = docs.map((d: any) => ({
-          id: String(d.id || d._id),
-          name: d.name,
-          address: d.address,
-          suburb: d.suburb,
-          state: d.state,
-          postcode: d.postcode || null,
-          phone: d.phone || null,
-          latitude: d.latitude ?? null,
-          longitude: d.longitude ?? null,
-          type: d.type,
-          hours: d.hours,
-          capabilities: d.capabilities
-        }));
-        // Ensure all national master locations are included if not present in DB
-        const dbSuburbs = new Set(dbLocations.map((l) => (l.suburb || "").toLowerCase()));
-        const missingFromMaster = knownLocations.filter(
-          (kl) => !dbSuburbs.has((kl.suburb || "").toLowerCase())
-        );
-        locations = [...dbLocations, ...missingFromMaster];
-      }
-    }
-  } catch (err) {
-    console.warn("MongoDB network locations lookup bypassed, using knownLocations", err);
-  }
-
+export default function NetworkPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Find a Branch", path: "/network" }
+        ])}
+      />
       <PageHero
-        eyebrow="Nationwide Transport Backbone · Interactive Locator"
-        title="Find Local Support. Wherever You Work."
-        intro="While the geography of Australia is vast, our national network map and distribution channels make us local. Connect with Ultimate Tyres wholesale distribution depots, heavy truck wheel alignment bays, and mobile fitting specialists across QLD, NSW, VIC, SA, and WA."
+        eyebrow="Find us · South East Queensland"
+        title="Three branches. Mobile vans on the road."
+        intro="Visit us at Rocklea, Yatala or Bald Hills, or ring one number and our mobile vans come to you."
+        crumb="Find a Branch"
       />
       <BranchesSection showAllLink={false} />
-      <section className="section">
+      <section className="section" style={{ background: "#f8faf9" }}>
         <div className="container">
-          <NetworkLocator locations={locations} />
+          <div className="branch-cards">
+            {branches.map((b) => (
+              <article key={b.id} className="branch-card">
+                <h2>
+                  {b.name}
+                  {b.note && <span className="branch-note">{b.note}</span>}
+                </h2>
+                <p className="branch-address">{branchAddress(b)}</p>
+                <ul className="check-list">
+                  {b.services.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+                <div className="branch-card-actions">
+                  <a href={directionsUrl(b)} target="_blank" rel="noopener noreferrer">
+                    Directions ›
+                  </a>
+                  <a href={telHref()}>{siteConfig.phone}</a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="branch-mobile-note">
+            Our mobile vans come to you. <a href={telHref()}>Ring {siteConfig.phone}</a> to check your area.
+          </p>
         </div>
       </section>
       <ContactBand />

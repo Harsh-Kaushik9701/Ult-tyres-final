@@ -60,7 +60,7 @@ export function TopUtilityRibbon() {
 
         <div className="top-utility-right">
           <Link href="/network" className="utility-link">
-            <span>📍 Interactive Network Map</span>
+            <span>📍 Find a Branch</span>
           </Link>
           <span className="utility-divider" aria-hidden="true">|</span>
           <Link href="/dealers/login" className="utility-link utility-highlight">
@@ -122,7 +122,7 @@ const navEntries: NavEntry[] = [
     ]
   },
   { href: "/news", label: "Insights" },
-  { href: "/network", label: "Network Map" },
+  { href: "/network", label: "Find a Branch" },
   { href: "/contact", label: "Contact" },
   { href: "/careers", label: "Join Us" }
 ];
@@ -199,7 +199,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h2 className="footer-heading">National Distribution</h2>
+            <h2 className="footer-heading">Our Branches</h2>
             <div className="footer-links">
               <a href={telHref()}>Toll-Free · {phone}</a>
               <a href={whatsappHref()} target="_blank" rel="noopener noreferrer">
@@ -212,7 +212,7 @@ export function Footer() {
                 </a>
               ))}
               <Link href="/news">Fleet Insights</Link>
-              <Link href="/network">Interactive Network Map</Link>
+              <Link href="/network">Find a Branch</Link>
               <Link href="/dealers/login">Wholesale Dealer Portal</Link>
               <Link href="/dealers/apply">Become a Dealer</Link>
               <Link href="/contact">Contact Our Team</Link>
