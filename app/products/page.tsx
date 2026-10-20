@@ -17,7 +17,7 @@ export default async function ProductsPage() {
   const products = await getPublicProducts();
   return (
     <>
-      <PageHero backdrop="shop"
+      <PageHero backdrop="products"
         eyebrow="Commercial Fleet Range · National Wholesale"
         title="Tyres Engineered for the Australian Road."
         intro="Browse our current commercial product specifications across flagship brands: Ralson, Blacklion, and Triangle. From interstate linehaul prime movers to municipal bus fleets and quarry tippers, find your fitment."

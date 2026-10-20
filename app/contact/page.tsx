@@ -31,7 +31,7 @@ export default async function ContactPage({ searchParams }: Props) {
   return (
     <>
       <PageHero
-        backdrop="truck"
+        backdrop="contact"
         eyebrow="We’re here to help"
         title="Let’s talk about your fleet."
         intro="Tell us what you’re working on – or about the role you’re after – and our team will help you find the right next step."

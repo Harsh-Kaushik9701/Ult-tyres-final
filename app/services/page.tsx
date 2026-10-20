@@ -30,7 +30,7 @@ export default function ServicesPage() {
           }
         ]}
       />
-      <PageHero backdrop="fitting"
+      <PageHero backdrop="services"
         eyebrow="Fleet services"
         title="Keep your fleet working."
         intro="Practical tyre and vehicle services to help reduce avoidable downtime and keep every kilometre productive."

@@ -26,7 +26,7 @@ export default async function BusesPage() {
 
   return (
     <>
-      <PageHero backdrop="trucks"
+      <PageHero backdrop="products"
         eyebrow="Passenger Transit Fleet · Bus & Coach Tyres"
         title="Bus & Coach Tyres, Ready for the Route."
         intro="Explore commercial radial specifications designed for municipal buses, electric transit fleets, and long-distance passenger coaches. Engineered with heavy sidewall kerb protectors and high-scrub compound formulations."

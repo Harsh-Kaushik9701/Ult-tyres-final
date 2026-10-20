@@ -98,15 +98,21 @@ To rebuild with new clips (needs ffmpeg with libx264 and libsvtav1): `python3 sc
 
 ## Page header backgrounds
 
-Every inner page header plays a short silent loop of matching footage, with animated accents on top (a rolling tread strip, a turning tyre ring and a red light sweep, all CSS-only and switched off for reduced motion):
+Every inner page header plays a short silent loop, with animated accents on top (a rolling tread strip, a turning tyre ring and a red light sweep, all CSS-only and switched off for reduced motion):
+
+Each tab has its own footage. None of it appears in the home page reel or on any other tab:
 
 | Theme | Footage | Pages |
 | --- | --- | --- |
-| `truck` | Branded service truck | About, Contact, Find a Branch |
-| `fitting` | Tyre fitting machines | Fleet Services, each service page |
-| `trucks` | Prime movers, fitter at work | Wheel Alignment, Truck/Bus tyres, Dealer Login |
-| `shop` | Tyre racks, Ralson tread | Products, brands, tyre detail, Become a Dealer |
-| `tread` | Tread close-up, fitter | Insights and articles |
+| `about` | Front of the Ultimate service truck | About Us |
+| `branch` | Pan across the logo and "Our locations" | Find a Branch |
+| `contact` | Truck graphics and phone panel | Contact |
+| `services` | Fitter at the tyre machine, wheel-nut gun | Fleet Services, each service page |
+| `alignment` | Trailer axles rolling past | Wheel Alignment |
+| `products` | Ralson display, Blacklion tread label (slow motion) | Products, truck/bus tyres, brands, tyre detail |
+| `insights` | Old tyre coming off, tread close-up | Insights and articles |
+| `dealer` | Wheel on the machine, fitter lifting a tyre | Become a Dealer |
+| `login` | Side view of the branded truck | Dealer Login |
 
 Change a page's footage with the `backdrop` prop on `<PageHero>`. Files are in `public/videos/backdrops/` (Full HD AV1 + H.264, 960×540 for phones, plus a poster). Rebuild them with `python3 scripts/build-page-backdrops.py <clips folder> public/videos/backdrops`, then bump `BACKDROP_VERSION` in `lib/backdrops.ts`.
 

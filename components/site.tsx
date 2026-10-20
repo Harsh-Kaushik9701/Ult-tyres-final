@@ -306,7 +306,7 @@ export function PageHero({
   intro,
   crumb,
   trail,
-  backdrop = "truck"
+  backdrop = "contact"
 }: {
   eyebrow: string;
   title: string;

@@ -6,4 +6,4 @@ export const metadata: Metadata = buildMetadata({
   description: "Apply to join the Ultimate Tyres dealer network and request access to wholesale commercial tyre pricing, live stock and rapid online ordering.",
   keywords: ["become a tyre dealer", "wholesale truck tyres", "tyre dealer program Australia", "trade tyre account"],
   path: "/dealers/apply"
-});export default function DealerApplyPage(){return <><PageHero backdrop="shop" eyebrow="Dealer network" title="Let’s grow together." intro="Apply to join the Ultimate Tyres network. Our team reviews each business before dealer portal access is activated."/><section className="section"><div className="container"><LeadForm kind="dealer-application"/></div></section></>;}
+});export default function DealerApplyPage(){return <><PageHero backdrop="dealer" eyebrow="Dealer network" title="Let’s grow together." intro="Apply to join the Ultimate Tyres network. Our team reviews each business before dealer portal access is activated."/><section className="section"><div className="container"><LeadForm kind="dealer-application"/></div></section></>;}

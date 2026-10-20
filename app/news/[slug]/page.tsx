@@ -108,7 +108,7 @@ export default async function InsightArticle({ params }: Props) {
           }
         ]}
       />
-      <PageHero backdrop="tread"
+      <PageHero backdrop="insights"
         eyebrow={`${article.category} · ${article.date} · ${article.readTime || "4 min read"}`}
         title={article.title}
         intro={article.excerpt}

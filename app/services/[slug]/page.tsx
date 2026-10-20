@@ -55,7 +55,7 @@ export default async function ServicePage({ params }: Props) {
           }
         ]}
       />
-      <PageHero backdrop="fitting"
+      <PageHero backdrop="services"
         eyebrow={`Fleet services · ${service.category}`}
         title={service.title}
         intro={service.short}

@@ -39,7 +39,7 @@ export default function WheelAlignmentPage() {
       />
       {/* Hero Section */}
       <section className="page-hero has-backdrop" style={{ color: "#fff" }}>
-        <PageBackdrop theme="trucks" />
+        <PageBackdrop theme="alignment" />
         <div className="container page-hero-inner">
           <div className="eyebrow" style={{ color: "var(--yellow)" }}>Specialist Heavy Vehicle Fleet Service</div>
           <h1 style={{ fontSize: 46, maxWidth: 860, lineHeight: 1.15, margin: "16px 0" }}>

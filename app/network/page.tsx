@@ -30,7 +30,7 @@ export default function NetworkPage() {
           { name: "Find a Branch", path: "/network" }
         ])}
       />
-      <PageHero backdrop="truck"
+      <PageHero backdrop="branch"
         eyebrow="Find us · South East Queensland"
         title="Three branches. Mobile vans on the road."
         intro="Visit us at Rocklea, Yatala or Bald Hills, or ring one number and our mobile vans come to you."
