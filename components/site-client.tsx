@@ -137,7 +137,6 @@ export function HeaderNav({ entries, children }: { entries: NavEntry[]; children
 /* ------------------------------------------------------------------ */
 
 export type HeroBanner = {
-  video: string;
   eyebrow: string;
   titleLine1: string;
   titleLine2: string;
@@ -148,6 +147,76 @@ export type HeroBanner = {
 };
 
 const SLIDE_DURATION = 5500;
+
+/**
+ * Background reel built from the UT01–UT04 clips (cropped, watermark-free,
+ * no audio). AV1 is tried first (~30% smaller); H.264 plays everywhere else.
+ * Phones get a smaller, taller cut.
+ */
+const HERO_REEL = {
+  mobileQuery: "(max-width: 768px)",
+  sources: [
+    { src: "/videos/hero-reel-mobile.av1.mp4", type: 'video/mp4; codecs="av01.0.04M.08"', mobile: true },
+    { src: "/videos/hero-reel-mobile.h264.mp4", type: 'video/mp4; codecs="avc1.640028"', mobile: true },
+    { src: "/videos/hero-reel.av1.mp4", type: 'video/mp4; codecs="av01.0.05M.08"', mobile: false },
+    { src: "/videos/hero-reel.h264.mp4", type: 'video/mp4; codecs="avc1.640028"', mobile: false }
+  ]
+};
+
+/**
+ * One continuous looping video behind every slide. The poster image (CSS
+ * background) shows instantly; the video only downloads after the page loads,
+ * and not at all for visitors who prefer reduced motion or have Data Saver on.
+ * It pauses while scrolled out of view.
+ */
+function HeroVideo() {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+    if (reduced || saveData) return;
+
+    video.muted = true; // required for autoplay on iOS/Chrome
+    video.load();
+    const tryPlay = () => void video.play().catch(() => undefined);
+    const observer = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? tryPlay() : video.pause()),
+      { threshold: 0.1 }
+    );
+    observer.observe(video);
+    const onPlaying = () => setPlaying(true);
+    video.addEventListener("playing", onPlaying);
+    return () => {
+      observer.disconnect();
+      video.removeEventListener("playing", onPlaying);
+      video.pause();
+    };
+  }, []);
+
+  return (
+    <div className="hero-bg-wrap" aria-hidden="true">
+      <div className="hero-reel-poster" />
+      <video
+        ref={ref}
+        className={`hero-reel${playing ? " is-playing" : ""}`}
+        muted
+        loop
+        playsInline
+        preload="none"
+        disablePictureInPicture
+        tabIndex={-1}
+      >
+        {HERO_REEL.sources.map((s) => (
+          <source key={s.src} src={s.src} type={s.type} media={s.mobile ? HERO_REEL.mobileQuery : undefined} />
+        ))}
+      </video>
+    </div>
+  );
+}
 
 export function HeroCarousel({ banners, stats }: { banners: HeroBanner[]; stats: { value: string; label: string }[] }) {
   const [active, setActive] = useState(0);
@@ -181,18 +250,7 @@ export function HeroCarousel({ banners, stats }: { banners: HeroBanner[]; stats:
 
   return (
     <section className="hero" aria-roledescription="carousel" aria-label="Ultimate Tyres highlights">
-      <div className="hero-bg-wrap" aria-hidden="true">
-        {banners.map((b, i) => (
-          <div key={i} className={`hero-bg-layer${i === active ? " active" : ""}`}>
-            {/* Only the visible slide loads its video. */}
-            {i === active && !reducedMotion ? (
-              <video autoPlay muted loop playsInline poster={b.image} preload="metadata">
-                <source src={b.video} type="video/mp4" />
-              </video>
-            ) : null}
-          </div>
-        ))}
-      </div>
+      <HeroVideo />
       <div className="hero-gradient" />
       <div className="hero-accent-strip" />
       <div className={`container hero-inner${fading ? " hero-fade" : ""}`}>

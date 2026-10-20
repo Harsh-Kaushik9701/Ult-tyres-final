@@ -309,7 +309,6 @@ export function SectionTitle({ eyebrow, title, text, dark = false }: { eyebrow: 
 
 const banners: HeroBanner[] = [
   {
-    video: "/videos/ralson-performance.mp4",
     eyebrow: "For the work that moves Australia",
     titleLine1: "Your fleet.",
     titleLine2: "Our drive.",
@@ -322,7 +321,6 @@ const banners: HeroBanner[] = [
     ]
   },
   {
-    video: "/videos/rdr75.mp4",
     eyebrow: "Commercial tyres · Real applications",
     titleLine1: "Built for",
     titleLine2: "the long haul.",
@@ -335,7 +333,6 @@ const banners: HeroBanner[] = [
     ]
   },
   {
-    video: "/videos/ralson-performance.mp4",
     eyebrow: "Designed for demanding routes",
     titleLine1: "Ready for",
     titleLine2: "what's ahead.",
@@ -348,7 +345,6 @@ const banners: HeroBanner[] = [
     ]
   },
   {
-    video: "/videos/rdr75.mp4",
     eyebrow: "A better way to care for your fleet",
     titleLine1: "More life",
     titleLine2: "in every mile.",
@@ -361,7 +357,6 @@ const banners: HeroBanner[] = [
     ]
   },
   {
-    video: "/videos/ralson-performance.mp4",
     eyebrow: "Dealer opportunities",
     titleLine1: "Local knowledge.",
     titleLine2: "National backing.",

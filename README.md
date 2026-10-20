@@ -71,6 +71,21 @@ All public pages (Home, About, Services, Wheel Alignment, Insights and articles,
 - `components/branch-map.tsx` – switching the Google map between branches
 - existing catalogue filter and dealer portal widgets
 
+## Home page background video
+
+The hero plays one looping reel built from the UT01–UT04 clips: watermarks cropped out, best moments trimmed, no audio, cross-faded. Files live in `public/videos/`:
+
+| File | Used for | Size |
+| --- | --- | --- |
+| `hero-reel.av1.mp4` | Desktop, modern browsers | ~1.4 MB |
+| `hero-reel.h264.mp4` | Desktop fallback (all browsers) | ~2.1 MB |
+| `hero-reel-mobile.av1.mp4` / `.h264.mp4` | Phones (≤768px, taller crop) | ~0.8 / 0.9 MB |
+| `hero-reel-poster*.jpg` | Shown instantly before the video starts | 25–60 KB |
+
+The browser downloads only one video. It starts after the page has loaded, pauses when scrolled out of view, and is skipped entirely with reduced motion or Data Saver turned on (the poster shows instead).
+
+To rebuild with new clips (needs ffmpeg): `python3 scripts/build-hero-reel.py <folder with UT01–UT04.mp4> public/videos`. Clip timings and crops are at the top of the script.
+
 ## SEO
 
 - Per-page meta title, description, keywords, canonical URL, Open Graph (`og:title`, `og:description`, `og:url`, `og:image`) and Twitter card tags via `buildMetadata()` in `lib/seo.ts`.
