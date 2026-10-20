@@ -22,7 +22,7 @@ export default function AboutPage() {
           { name: "About Us", path: "/about" }
         ])}
       />
-      <PageHero backdrop="van"
+      <PageHero backdrop="truck"
         crumb="About Us"
         eyebrow="The Dependable Co-Pilot · About Ultimate Tyres"
         title="The Ultimate Foundation for Every Journey."

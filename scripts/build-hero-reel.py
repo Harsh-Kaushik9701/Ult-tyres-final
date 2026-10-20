@@ -1,89 +1,107 @@
-"""Build the hero background reel from the four uploaded clips.
+"""Build the home page hero background reel, synced to the five hero slides.
+
+The reel is five segments of exactly SLIDE seconds, one per slide, in order.
+The carousel (components/site-client.tsx) reads the video's playback time to
+decide which slide is showing, so text and footage always change together.
 
 Each clip is cropped to remove watermarks (CapCut, RALSON badge, Blacklion/UT
-logo), trimmed to its best moment, joined with short cross-fades, and exported
-in Full HD: a wide 1920x1080 (desktop) and a tall 1080x1440 (mobile) version,
-compressed as AV1 + H.264.
+logo), denoised, upscaled to Full HD with light sharpening, and has no audio.
+Output: 1920x1080 (desktop) and 1080x1440 (phones) as AV1 + H.264, plus posters.
 
 Usage (needs ffmpeg with libx264 and libsvtav1):
-    python3 scripts/build-hero-reel.py <folder with UT01.mp4..UT04.mp4 and ut2.mp4> public/videos
+    python3 scripts/build-hero-reel.py <folder with UT01-UT03.mp4 and ut2.mp4> public/videos
 
-Clip times and crops below are tuned for the original UT01–UT04 files; adjust
-them if the source clips change.
+Keep SLIDE equal to SLIDE_DURATION in components/site-client.tsx.
 """
 import os, subprocess, sys, tempfile
-SRC_DIR = sys.argv[1]
-DEST = sys.argv[2]
-OUT = tempfile.mkdtemp(prefix="hero-reel-")
-SRC = {
-    "UT01": f"{SRC_DIR}/UT01.mp4",   # 496x368 letterboxed, 120fps, logo top-left
-    "UT02": f"{SRC_DIR}/UT02.mp4",   # 848x478, CapCut top-right, RALSON bottom-right
-    "UT03": f"{SRC_DIR}/UT03.mp4",   # 848x478, CapCut top-right, RALSON bottom-right
-    "UT04": f"{SRC_DIR}/UT04.mp4",   # 464x832 portrait, UT mobile van
-    "ut2": f"{SRC_DIR}/ut2.mp4",     # 1024x576, branded UT service truck, no watermarks
+
+SRC_DIR, DEST = sys.argv[1], sys.argv[2]
+TMP = tempfile.mkdtemp(prefix="hero-reel-")
+SLIDE = 5.5
+FPS = 24
+SRC = {k: f"{SRC_DIR}/{k}.mp4" for k in ["UT01", "UT02", "UT03", "ut2"]}
+
+# (wide 16:9 crop, tall 3:4 crop) per source – windows that avoid the watermarks.
+CROP = {
+    "UT01": ("426:240:40:84", "180:240:110:84"),
+    "UT02": ("680:382:0:48", "255:340:170:58"),
+    "UT03": ("608:342:0:56", "225:300:330:56"),
+    "ut2": ("1024:576:0:0", "432:576:296:0"),
 }
-# (source, start, duration, wide crop w:h:x:y (2:1), tall crop w:h:x:y (3:4))
-# Crops are 16:9 (wide/desktop) and 3:4 (tall/mobile) windows that avoid the watermarks.
-CLIPS = [
-    ("ut2", 9.0, 9.0, "1024:576:0:0", "432:576:296:0"),     # UT service truck (9s-18s)
-    ("UT02", 0.3, 4.0, "680:382:0:48", "255:340:170:58"),   # tyre racks in the shop
-    ("UT03", 0.3, 4.0, "608:342:0:56", "225:300:330:56"),   # prime mover wheels
-    ("UT01", 4.0, 4.0, "426:240:40:84", "180:240:110:84"),  # tyre on the fitting machine
-    ("UT02", 17.5, 2.0, "680:382:0:48", "255:340:0:58"),    # fitter with impact wrench
-    ("UT04", 1.0, 4.0, "464:260:0:292", "464:619:0:150"),   # UT mobile service van
-    ("UT03", 7.2, 2.0, "608:342:0:56", "225:300:150:56"),   # fitter lifting a tyre
-    ("UT02", 6.0, 3.5, "680:382:0:48", "255:340:260:58"),   # wheel on the machine
-    ("UT02", 10.0, 2.2, "680:382:0:48", "255:340:300:58"),  # truck rolling out
-    ("UT03", 12.6, 3.4, "608:342:0:56", "225:300:200:56"),  # Ralson tread close-up
+# Optional per-clip tall-crop override (x offset) to keep the subject in frame on phones.
+TALL_X = {("UT02", 18.25): 0, ("UT02", 10.0): 300, ("UT03", 12.6): 200, ("UT01", 11.0): 110}
+
+# One entry per hero slide, in slide order. Each list sums to SLIDE seconds.
+SLIDES = [
+    [("ut2", 9.0, 5.5)],                          # 01 Your fleet. Our drive. – branded service truck
+    [("UT03", 1.0, 5.5)],                         # 02 Built for the long haul – prime movers
+    [("UT03", 12.6, 2.5), ("UT01", 11.0, 3.0)],   # 03 Ready for what's ahead – Ralson / Blacklion tread close-ups
+    [("UT01", 4.0, 4.2), ("UT02", 18.25, 1.3)],   # 04 More life in every mile – fitting, fitter at work
+    [("UT02", 0.3, 4.0), ("UT02", 10.0, 1.5)],    # 05 Local knowledge – tyre stock, truck rolling out
 ]
-FADE = 0.6
+EDGE_FADE = 0.25  # dip at each slide boundary, matching the text fade
 
-def build(name, size, crop_index):
+
+def crop_for(src, start, tall):
+    wide, tall_crop = CROP[src]
+    if not tall:
+        return wide
+    w, h, x, y = tall_crop.split(":")
+    x = TALL_X.get((src, start), int(x))
+    return f"{w}:{h}:{x}:{y}"
+
+
+def build(name, size, tall):
     w, h = size
-    inputs, chains = [], []
-    for i, clip in enumerate(CLIPS):
-        src, start, dur = clip[0], clip[1], clip[2]
-        crop = clip[3 + crop_index]
-        inputs += ["-ss", str(start), "-t", str(dur), "-i", SRC[src]]
+    inputs, chains, seg_labels, idx = [], [], [], 0
+    for s, clips in enumerate(SLIDES):
+        parts = []
+        for src, start, dur in clips:
+            # Read a little extra, then trim to the exact frame count below.
+            inputs += ["-ss", str(start), "-t", str(dur + 0.3), "-i", SRC[src]]
+            frames = round(dur * FPS)
+            chains.append(
+                f"[{idx}:v]fps={FPS},crop={crop_for(src, start, tall)},hqdn3d=2:2:6:6,"
+                f"scale={w}:{h}:flags=lanczos,unsharp=5:5:0.6:5:5:0,setsar=1,format=yuv420p,"
+                f"trim=end_frame={frames},setpts=PTS-STARTPTS[p{idx}]"
+            )
+            parts.append(f"[p{idx}]")
+            idx += 1
+        seg_frames = round(SLIDE * FPS)
         chains.append(
-            f"[{i}:v]fps=24,crop={crop},hqdn3d=2:2:6:6,scale={w}:{h}:flags=lanczos,"
-            f"unsharp=5:5:0.6:5:5:0,setsar=1,"
-            f"format=yuv420p,settb=AVTB[c{i}]"
+            f"{''.join(parts)}concat=n={len(parts)}:v=1:a=0,trim=end_frame={seg_frames},setpts=PTS-STARTPTS,"
+            f"fade=t=in:st=0:d={EDGE_FADE},fade=t=out:st={SLIDE - EDGE_FADE}:d={EDGE_FADE}[s{s}]"
         )
-    # cross-fade chain
-    prev, total = "c0", CLIPS[0][2]
-    for i in range(1, len(CLIPS)):
-        offset = total - FADE
-        out = f"x{i}"
-        chains.append(f"[{prev}][c{i}]xfade=transition=fade:duration={FADE}:offset={offset:.3f}[{out}]")
-        prev, total = out, offset + CLIPS[i][2]
-    # soft fade at the loop point
-    chains.append(f"[{prev}]fade=t=in:st=0:d=0.5,fade=t=out:st={total-0.5:.3f}:d=0.5[v]")
-    cmd = ["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(chains),
-           "-map", "[v]", "-an", "-c:v", "libx264", "-crf", "12", "-preset", "fast",
-           f"{OUT}/master-{name}.mp4"]
-    subprocess.run(cmd, check=True)
-    print(f"master-{name}.mp4  {w}x{h}  {total:.1f}s")
+        seg_labels.append(f"[s{s}]")
+    chains.append(f"{''.join(seg_labels)}concat=n={len(SLIDES)}:v=1:a=0[v]")
+    out = f"{TMP}/master-{name}.mp4"
+    subprocess.run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(chains),
+                    "-map", "[v]", "-an", "-r", str(FPS), "-c:v", "libx264", "-crf", "12", "-preset", "fast", out],
+                   check=True)
+    return out
 
-DENOISE = "null"  # denoise is done per clip, before upscaling
 
 def encode(master, base):
-    common = ["-vf", DENOISE, "-an", "-pix_fmt", "yuv420p", "-g", "48", "-movflags", "+faststart"]
+    common = ["-an", "-pix_fmt", "yuv420p", "-g", str(FPS * 2), "-movflags", "+faststart"]
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", master, *common, "-c:v", "libsvtav1",
-                    "-crf", "48", "-preset", "6", f"{DEST}/{base}.av1.mp4"], check=True)
+                    "-crf", "48", "-preset", "6", f"{DEST}/{base}.av1.mp4"], check=True, stderr=subprocess.DEVNULL)
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", master, *common, "-c:v", "libx264", "-crf", "34",
                     "-preset", "slow", "-tune", "film", "-profile:v", "high", "-level", "4.0",
                     f"{DEST}/{base}.h264.mp4"], check=True)
 
+
 def poster(master, name):
+    # A frame from slide 01, which is what the page shows before the video starts.
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1.5", "-i", master, "-frames:v", "1",
                     "-q:v", "9", f"{DEST}/{name}"], check=True)
 
+
 os.makedirs(DEST, exist_ok=True)
-build("wide", (1920, 1080), 0)   # Full HD 16:9
-build("tall", (1080, 1440), 1)   # Full HD width, 3:4 for phones
-encode(f"{OUT}/master-wide.mp4", "hero-reel")
-encode(f"{OUT}/master-tall.mp4", "hero-reel-mobile")
-poster(f"{OUT}/master-wide.mp4", "hero-reel-poster.jpg")
-poster(f"{OUT}/master-tall.mp4", "hero-reel-poster-mobile.jpg")
-print("Done ->", DEST)
+wide = build("wide", (1920, 1080), tall=False)
+tall = build("tall", (1080, 1440), tall=True)
+print("masters built", flush=True)
+encode(wide, "hero-reel")
+encode(tall, "hero-reel-mobile")
+poster(wide, "hero-reel-poster.jpg")
+poster(tall, "hero-reel-poster-mobile.jpg")
+print("HERO-REEL-DONE ->", DEST)

@@ -73,7 +73,17 @@ All public pages (Home, About, Services, Wheel Alignment, Insights and articles,
 
 ## Home page background video
 
-The hero plays one looping 33-second reel. It opens with the branded service truck (`ut2.mp4`, seconds 9–18), followed by the best moments of UT01–UT04: watermarks cropped out, no audio, cross-faded. Everything is exported in Full HD. The sources are 480–1024 px wide, so they're upscaled with denoise and light sharpening. Files live in `public/videos/`:
+The hero plays one looping 27.5-second reel made of five 5.5-second segments, one per slide. The carousel reads the video's playback time, so slide text and footage always change together, and clicking a slide dot jumps the video to that slide's footage:
+
+| Slide | Footage |
+| --- | --- |
+| 01 Your fleet. Our drive. | Branded service truck (`ut2.mp4`) |
+| 02 Built for the long haul. | Prime movers in the yard |
+| 03 Ready for what's ahead. | Ralson tread close-ups |
+| 04 More life in every mile. | Fitting machine, fitter with impact wrench |
+| 05 Local knowledge. National backing. | Tyre stock, truck rolling out |
+
+Watermarks are cropped out and there's no audio. Everything is exported in Full HD; the sources are 480–1024 px wide, so they're upscaled with denoise and light sharpening. Until the video plays (or if it never does), the slides advance on a timer instead. Files live in `public/videos/`:
 
 | File | Used for | Resolution | Size |
 | --- | --- | --- | --- |
@@ -84,7 +94,7 @@ The hero plays one looping 33-second reel. It opens with the branded service tru
 
 The browser downloads only one video. It starts after the page has loaded, pauses when scrolled out of view, and is skipped entirely with reduced motion or Data Saver turned on (the poster shows instead).
 
-To rebuild with new clips (needs ffmpeg with libx264 and libsvtav1): `python3 scripts/build-hero-reel.py <folder with UT01–UT04.mp4 and ut2.mp4> public/videos`. Clip timings and crops are at the top of the script.
+To rebuild with new clips (needs ffmpeg with libx264 and libsvtav1): `python3 scripts/build-hero-reel.py <folder with UT01–UT03.mp4 and ut2.mp4> public/videos`. Each slide's clips are listed in `SLIDES` at the top of the script; keep the slide count and `SLIDE` length in step with the carousel, and bump the reel version in `components/site-client.tsx`.
 
 ## Page header backgrounds
 
@@ -92,8 +102,7 @@ Every inner page header plays a short silent loop of matching footage, with anim
 
 | Theme | Footage | Pages |
 | --- | --- | --- |
-| `truck` | Branded service truck | Contact, Find a Branch |
-| `van` | UT mobile service van | About |
+| `truck` | Branded service truck | About, Contact, Find a Branch |
 | `fitting` | Tyre fitting machines | Fleet Services, each service page |
 | `trucks` | Prime movers, fitter at work | Wheel Alignment, Truck/Bus tyres, Dealer Login |
 | `shop` | Tyre racks, Ralson tread | Products, brands, tyre detail, Become a Dealer |

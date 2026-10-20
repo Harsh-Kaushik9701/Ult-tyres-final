@@ -151,14 +151,15 @@ export type HeroBanner = {
 const SLIDE_DURATION = 5500;
 
 /**
- * Background reel built from the ut2 + UT01–UT04 clips (cropped, watermark-free,
- * no audio), exported in Full HD: 1920x1080 for desktop, 1080x1440 for phones.
+ * Hero background reel (scripts/build-hero-reel.py): one segment of exactly
+ * SLIDE_DURATION per slide, in slide order, built from the ut2 + UT01–UT03 clips
+ * (cropped, watermark-free, no audio) in Full HD – 1920x1080 desktop, 1080x1440 phones.
  * Bump the version when the files change so browsers fetch the new reel.
  */
 const HERO_REEL = {
-  sources: videoSources("/videos/hero-reel", "/videos/hero-reel-mobile", 2),
-  poster: "/videos/hero-reel-poster.jpg?v=2",
-  mobilePoster: "/videos/hero-reel-poster-mobile.jpg?v=2"
+  sources: videoSources("/videos/hero-reel", "/videos/hero-reel-mobile", 3),
+  poster: "/videos/hero-reel-poster.jpg?v=3",
+  mobilePoster: "/videos/hero-reel-poster-mobile.jpg?v=3"
 };
 
 /**
@@ -170,14 +171,23 @@ export function BackgroundVideo({
   sources,
   poster,
   mobilePoster,
-  className = ""
+  className = "",
+  videoRef,
+  onStart
 }: {
   sources: VideoSource[];
   poster: string;
   mobilePoster?: string;
   className?: string;
+  /** Lets a parent read the playback time (used to sync the hero slides). */
+  videoRef?: React.RefObject<HTMLVideoElement | null>;
+  /** Called once, when the video first starts playing. */
+  onStart?: (video: HTMLVideoElement) => void;
 }) {
-  const ref = useRef<HTMLVideoElement>(null);
+  const ownRef = useRef<HTMLVideoElement>(null);
+  const ref = videoRef ?? ownRef;
+  const onStartRef = useRef(onStart);
+  onStartRef.current = onStart;
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
@@ -195,13 +205,21 @@ export function BackgroundVideo({
       { threshold: 0.05 }
     );
     observer.observe(video);
-    const onPlaying = () => setPlaying(true);
+    let started = false;
+    const onPlaying = () => {
+      setPlaying(true);
+      if (!started) {
+        started = true;
+        onStartRef.current?.(video);
+      }
+    };
     video.addEventListener("playing", onPlaying);
     return () => {
       observer.disconnect();
       video.removeEventListener("playing", onPlaying);
       video.pause();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const posterStyle = {
@@ -230,16 +248,22 @@ export function BackgroundVideo({
   );
 }
 
-function HeroVideo() {
-  return <BackgroundVideo {...HERO_REEL} className="hero-bg-wrap" />;
-}
 
 export function HeroCarousel({ banners, stats }: { banners: HeroBanner[]; stats: { value: string; label: string }[] }) {
   const [active, setActive] = useState(0);
   const [fading, setFading] = useState(false);
   const [animKey, setAnimKey] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  /** True once the background video is playing – from then on it drives the slides. */
+  const [videoLive, setVideoLive] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const activeRef = useRef(0);
   const slide = banners[active];
+  const segment = SLIDE_DURATION / 1000;
+
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -249,24 +273,67 @@ export function HeroCarousel({ banners, stats }: { banners: HeroBanner[]; stats:
     return () => query.removeEventListener("change", onChange);
   }, []);
 
-  const go = useCallback((n: number) => {
-    setFading(true);
-    window.setTimeout(() => {
-      setActive(n);
-      setAnimKey((k) => k + 1);
-      setFading(false);
-    }, 380);
-  }, []);
-
+  // Video-driven mode: the slide is whichever segment of the reel is playing.
+  // Text fades out in the last moment of a segment and back in on the next one,
+  // in step with the dip in the footage.
   useEffect(() => {
-    if (reducedMotion) return;
+    const video = videoRef.current;
+    if (!videoLive || !video) return;
+    let raf = 0;
+    const tick = () => {
+      const t = video.currentTime;
+      const index = Math.floor(t / segment) % banners.length;
+      const remaining = segment - (t % segment);
+      if (index !== activeRef.current) {
+        activeRef.current = index;
+        setActive(index);
+        setAnimKey((k) => k + 1);
+      }
+      setFading(remaining < 0.3 && !video.paused);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [videoLive, segment, banners.length]);
+
+  // When the video starts, jump it to the slide that's already showing.
+  const onVideoStart = useCallback(
+    (video: HTMLVideoElement) => {
+      video.currentTime = activeRef.current * segment + 0.01;
+      setFading(false);
+      setAnimKey((k) => k + 1);
+      setVideoLive(true);
+    },
+    [segment]
+  );
+
+  const go = useCallback(
+    (n: number) => {
+      const video = videoRef.current;
+      if (videoLive && video) {
+        video.currentTime = n * segment + 0.01; // footage and text follow
+        return;
+      }
+      setFading(true);
+      window.setTimeout(() => {
+        setActive(n);
+        setAnimKey((k) => k + 1);
+        setFading(false);
+      }, 380);
+    },
+    [videoLive, segment]
+  );
+
+  // Timer mode, used until the video plays (or if it never does: reduced motion, Data Saver).
+  useEffect(() => {
+    if (reducedMotion || videoLive) return;
     const timer = window.setTimeout(() => go((active + 1) % banners.length), SLIDE_DURATION);
     return () => window.clearTimeout(timer);
-  }, [active, animKey, go, banners.length, reducedMotion]);
+  }, [active, animKey, go, banners.length, reducedMotion, videoLive]);
 
   return (
     <section className="hero" aria-roledescription="carousel" aria-label="Ultimate Tyres highlights">
-      <HeroVideo />
+      <BackgroundVideo {...HERO_REEL} className="hero-bg-wrap" videoRef={videoRef} onStart={onVideoStart} />
       <div className="hero-gradient" />
       <div className="hero-accent-strip" />
       <div className={`container hero-inner${fading ? " hero-fade" : ""}`}>

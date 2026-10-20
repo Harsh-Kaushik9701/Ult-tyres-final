@@ -5,27 +5,25 @@ audio), exported in Full HD for desktop and 960x540 for phones, as AV1 + H.264,
 plus a poster image.
 
 Usage (needs ffmpeg with libx264 and libsvtav1):
-    python3 scripts/build-page-backdrops.py <folder with UT01-UT04.mp4 and ut2.mp4> public/videos/backdrops
+    python3 scripts/build-page-backdrops.py <folder with UT01-UT03.mp4 and ut2.mp4> public/videos/backdrops
 """
 import os, subprocess, sys, tempfile
 
 SRC_DIR, DEST = sys.argv[1], sys.argv[2]
 TMP = tempfile.mkdtemp(prefix="backdrops-")
-SRC = {k: f"{SRC_DIR}/{k}.mp4" for k in ["UT01", "UT02", "UT03", "UT04", "ut2"]}
+SRC = {k: f"{SRC_DIR}/{k}.mp4" for k in ["UT01", "UT02", "UT03", "ut2"]}
 
 # 16:9 crop windows that avoid the CapCut / RALSON / Blacklion watermarks.
 CROP = {
     "UT01": "426:240:40:84",
     "UT02": "680:382:0:48",
     "UT03": "608:342:0:56",
-    "UT04": "464:260:0:292",
     "ut2": "1024:576:0:0",
 }
 
 # theme -> list of (source, start, duration)
 THEMES = {
     "truck":   [("ut2", 9.0, 7.0)],                                    # branded service truck
-    "van":     [("UT04", 0.5, 6.0)],                                   # UT mobile service van
     "fitting": [("UT01", 4.0, 4.0), ("UT02", 6.0, 3.5)],               # tyre fitting machines
     "trucks":  [("UT03", 0.3, 4.0), ("UT02", 17.5, 2.0), ("UT02", 10.0, 2.2)],  # prime movers, fitter
     "shop":    [("UT02", 0.3, 4.0), ("UT03", 12.6, 3.4)],              # tyre racks, Ralson tread
