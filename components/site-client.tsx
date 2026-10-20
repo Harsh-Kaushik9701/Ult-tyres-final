@@ -149,17 +149,18 @@ export type HeroBanner = {
 const SLIDE_DURATION = 5500;
 
 /**
- * Background reel built from the UT01–UT04 clips (cropped, watermark-free,
- * no audio). AV1 is tried first (~30% smaller); H.264 plays everywhere else.
- * Phones get a smaller, taller cut.
+ * Background reel built from the ut2 + UT01–UT04 clips (cropped, watermark-free,
+ * no audio), exported in Full HD: 1920x1080 for desktop, 1080x1440 for phones.
+ * AV1 is tried first (smaller); H.264 plays everywhere else.
  */
+// Bump ?v= when the video files change so browsers fetch the new reel.
 const HERO_REEL = {
   mobileQuery: "(max-width: 768px)",
   sources: [
-    { src: "/videos/hero-reel-mobile.av1.mp4", type: 'video/mp4; codecs="av01.0.04M.08"', mobile: true },
-    { src: "/videos/hero-reel-mobile.h264.mp4", type: 'video/mp4; codecs="avc1.640028"', mobile: true },
-    { src: "/videos/hero-reel.av1.mp4", type: 'video/mp4; codecs="av01.0.05M.08"', mobile: false },
-    { src: "/videos/hero-reel.h264.mp4", type: 'video/mp4; codecs="avc1.640028"', mobile: false }
+    { src: "/videos/hero-reel-mobile.av1.mp4?v=2", type: 'video/mp4; codecs="av01.0.08M.08"', mobile: true },
+    { src: "/videos/hero-reel-mobile.h264.mp4?v=2", type: 'video/mp4; codecs="avc1.640028"', mobile: true },
+    { src: "/videos/hero-reel.av1.mp4?v=2", type: 'video/mp4; codecs="av01.0.08M.08"', mobile: false },
+    { src: "/videos/hero-reel.h264.mp4?v=2", type: 'video/mp4; codecs="avc1.640028"', mobile: false }
   ]
 };
 

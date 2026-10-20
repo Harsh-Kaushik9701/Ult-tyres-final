@@ -73,18 +73,18 @@ All public pages (Home, About, Services, Wheel Alignment, Insights and articles,
 
 ## Home page background video
 
-The hero plays one looping reel built from the UT01–UT04 clips: watermarks cropped out, best moments trimmed, no audio, cross-faded. Files live in `public/videos/`:
+The hero plays one looping 33-second reel. It opens with the branded service truck (`ut2.mp4`, seconds 9–18), followed by the best moments of UT01–UT04: watermarks cropped out, no audio, cross-faded. Everything is exported in Full HD. The sources are 480–1024 px wide, so they're upscaled with denoise and light sharpening. Files live in `public/videos/`:
 
-| File | Used for | Size |
-| --- | --- | --- |
-| `hero-reel.av1.mp4` | Desktop, modern browsers | ~1.4 MB |
-| `hero-reel.h264.mp4` | Desktop fallback (all browsers) | ~2.1 MB |
-| `hero-reel-mobile.av1.mp4` / `.h264.mp4` | Phones (≤768px, taller crop) | ~0.8 / 0.9 MB |
-| `hero-reel-poster*.jpg` | Shown instantly before the video starts | 25–60 KB |
+| File | Used for | Resolution | Size |
+| --- | --- | --- | --- |
+| `hero-reel.av1.mp4` | Desktop, modern browsers | 1920×1080 | ~3.6 MB |
+| `hero-reel.h264.mp4` | Desktop fallback (all browsers) | 1920×1080 | ~5.4 MB |
+| `hero-reel-mobile.av1.mp4` / `.h264.mp4` | Phones (≤768px) | 1080×1440 | ~2.5 / 4.1 MB |
+| `hero-reel-poster*.jpg` | Shown instantly before the video starts | — | 90–140 KB |
 
 The browser downloads only one video. It starts after the page has loaded, pauses when scrolled out of view, and is skipped entirely with reduced motion or Data Saver turned on (the poster shows instead).
 
-To rebuild with new clips (needs ffmpeg): `python3 scripts/build-hero-reel.py <folder with UT01–UT04.mp4> public/videos`. Clip timings and crops are at the top of the script.
+To rebuild with new clips (needs ffmpeg with libx264 and libsvtav1): `python3 scripts/build-hero-reel.py <folder with UT01–UT04.mp4 and ut2.mp4> public/videos`. Clip timings and crops are at the top of the script.
 
 ## SEO
 
