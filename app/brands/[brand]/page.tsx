@@ -52,7 +52,7 @@ export default async function BrandPage({
 
   return (
     <>
-      <PageHero
+      <PageHero backdrop="shop"
         eyebrow={`${brand.name} Commercial Radial Range · Ultimate Tyres`}
         title={brand.strap}
         intro={brand.copy}

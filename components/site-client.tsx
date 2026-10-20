@@ -10,6 +10,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { videoSources, MOBILE_QUERY, type VideoSource } from "@/lib/video";
+import { CAREERS_TOPIC } from "@/lib/forms";
 
 /* ------------------------------------------------------------------ */
 /* Header navigation (dropdowns + mobile menu)                         */
@@ -151,26 +153,30 @@ const SLIDE_DURATION = 5500;
 /**
  * Background reel built from the ut2 + UT01–UT04 clips (cropped, watermark-free,
  * no audio), exported in Full HD: 1920x1080 for desktop, 1080x1440 for phones.
- * AV1 is tried first (smaller); H.264 plays everywhere else.
+ * Bump the version when the files change so browsers fetch the new reel.
  */
-// Bump ?v= when the video files change so browsers fetch the new reel.
 const HERO_REEL = {
-  mobileQuery: "(max-width: 768px)",
-  sources: [
-    { src: "/videos/hero-reel-mobile.av1.mp4?v=2", type: 'video/mp4; codecs="av01.0.08M.08"', mobile: true },
-    { src: "/videos/hero-reel-mobile.h264.mp4?v=2", type: 'video/mp4; codecs="avc1.640028"', mobile: true },
-    { src: "/videos/hero-reel.av1.mp4?v=2", type: 'video/mp4; codecs="av01.0.08M.08"', mobile: false },
-    { src: "/videos/hero-reel.h264.mp4?v=2", type: 'video/mp4; codecs="avc1.640028"', mobile: false }
-  ]
+  sources: videoSources("/videos/hero-reel", "/videos/hero-reel-mobile", 2),
+  poster: "/videos/hero-reel-poster.jpg?v=2",
+  mobilePoster: "/videos/hero-reel-poster-mobile.jpg?v=2"
 };
 
 /**
- * One continuous looping video behind every slide. The poster image (CSS
- * background) shows instantly; the video only downloads after the page loads,
- * and not at all for visitors who prefer reduced motion or have Data Saver on.
- * It pauses while scrolled out of view.
+ * Muted, looping background video. The poster (CSS background) shows instantly;
+ * the video only downloads after the page loads, and not at all for visitors who
+ * prefer reduced motion or have Data Saver on. It pauses while out of view.
  */
-function HeroVideo() {
+export function BackgroundVideo({
+  sources,
+  poster,
+  mobilePoster,
+  className = ""
+}: {
+  sources: VideoSource[];
+  poster: string;
+  mobilePoster?: string;
+  className?: string;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -186,7 +192,7 @@ function HeroVideo() {
     const tryPlay = () => void video.play().catch(() => undefined);
     const observer = new IntersectionObserver(
       ([entry]) => (entry.isIntersecting ? tryPlay() : video.pause()),
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     );
     observer.observe(video);
     const onPlaying = () => setPlaying(true);
@@ -198,12 +204,17 @@ function HeroVideo() {
     };
   }, []);
 
+  const posterStyle = {
+    "--poster": `url(${poster})`,
+    "--poster-mobile": `url(${mobilePoster ?? poster})`
+  } as React.CSSProperties;
+
   return (
-    <div className="hero-bg-wrap" aria-hidden="true">
-      <div className="hero-reel-poster" />
+    <div className={`bg-video-wrap ${className}`} aria-hidden="true">
+      <div className="bg-video-poster" style={posterStyle} />
       <video
         ref={ref}
-        className={`hero-reel${playing ? " is-playing" : ""}`}
+        className={`bg-video${playing ? " is-playing" : ""}`}
         muted
         loop
         playsInline
@@ -211,12 +222,16 @@ function HeroVideo() {
         disablePictureInPicture
         tabIndex={-1}
       >
-        {HERO_REEL.sources.map((s) => (
-          <source key={s.src} src={s.src} type={s.type} media={s.mobile ? HERO_REEL.mobileQuery : undefined} />
+        {sources.map((s) => (
+          <source key={s.src} src={s.src} type={s.type} media={s.mobile ? MOBILE_QUERY : undefined} />
         ))}
       </video>
     </div>
   );
+}
+
+function HeroVideo() {
+  return <BackgroundVideo {...HERO_REEL} className="hero-bg-wrap" />;
 }
 
 export function HeroCarousel({ banners, stats }: { banners: HeroBanner[]; stats: { value: string; label: string }[] }) {
@@ -311,9 +326,17 @@ export function HeroCarousel({ banners, stats }: { banners: HeroBanner[]; stats:
 /* Lead / application form                                             */
 /* ------------------------------------------------------------------ */
 
-export function LeadForm({ kind = "contact" }: { kind?: "contact" | "dealer-application" | "careers" }) {
+export function LeadForm({
+  kind = "contact",
+  initialTopic
+}: {
+  kind?: "contact" | "dealer-application" | "careers";
+  /** Pre-selects the "I'm enquiring about" option on the contact form. */
+  initialTopic?: string;
+}) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [topic, setTopic] = useState(initialTopic || "Fleet tyres");
 
   async function submit(form: HTMLFormElement) {
     setBusy(true);
@@ -323,7 +346,7 @@ export function LeadForm({ kind = "contact" }: { kind?: "contact" | "dealer-appl
       const response = await fetch("/api/lead", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...values, kind })
+        body: JSON.stringify({ ...values, kind: effectiveKind })
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "We couldn’t send that just now. Please try again.");
@@ -336,7 +359,9 @@ export function LeadForm({ kind = "contact" }: { kind?: "contact" | "dealer-appl
   }
 
   const application = kind === "dealer-application";
-  const careers = kind === "careers";
+  // On the contact form, choosing the careers topic turns it into a job enquiry.
+  const careers = kind === "careers" || (kind === "contact" && topic === CAREERS_TOPIC);
+  const effectiveKind = careers ? "careers" : kind;
 
   return (
     <form
@@ -353,7 +378,7 @@ export function LeadForm({ kind = "contact" }: { kind?: "contact" | "dealer-appl
           <p>Share a few details about your business. Applications are reviewed by our team before portal access is activated.</p>
         </>
       )}
-      {careers && (
+      {kind === "careers" && (
         <>
           <div className="eyebrow">Careers</div>
           <h2>Bring your drive.</h2>
@@ -421,14 +446,15 @@ export function LeadForm({ kind = "contact" }: { kind?: "contact" | "dealer-appl
             <input className="field" id="role" name="role" maxLength={120} />
           </div>
         )}
-        {!application && !careers && (
+        {kind === "contact" && (
           <div className="form-field">
             <label htmlFor="topic">I’m enquiring about</label>
-            <select className="select" id="topic" name="topic">
+            <select className="select" id="topic" name="topic" value={topic} onChange={(e) => setTopic(e.target.value)}>
               <option>Fleet tyres</option>
               <option>Fleet services</option>
               <option>Dealer network</option>
               <option>General enquiry</option>
+              <option>{CAREERS_TOPIC}</option>
             </select>
           </div>
         )}

@@ -36,7 +36,13 @@ export const siteConfig = {
     height: 630,
     alt: "Ultimate Tyres – commercial tyres and fleet support across Australia"
   },
-  logo: "/images/utlogo.png"
+  logo: "/images/utlogo.png",
+  /** Replace with the company's real profile pages. */
+  social: {
+    linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL || "https://www.linkedin.com",
+    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com",
+    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com"
+  }
 } as const;
 
 export function absoluteUrl(path = "/"): string {

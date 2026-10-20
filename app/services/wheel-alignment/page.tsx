@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ContactBand } from "@/components/site";
+import { ContactBand, PageBackdrop } from "@/components/site";
 import { AlignmentCalculator } from "@/components/alignment-calculator";
 import { JsonLd } from "@/components/json-ld";
 import { breadcrumbSchema, buildMetadata } from "@/lib/seo";
@@ -38,8 +38,9 @@ export default function WheelAlignmentPage() {
         ]}
       />
       {/* Hero Section */}
-      <section className="page-hero" style={{ background: "linear-gradient(135deg, #141717 0%, #1e2424 100%)", color: "#fff", position: "relative" }}>
-        <div className="container">
+      <section className="page-hero has-backdrop" style={{ color: "#fff" }}>
+        <PageBackdrop theme="trucks" />
+        <div className="container page-hero-inner">
           <div className="eyebrow" style={{ color: "var(--yellow)" }}>Specialist Heavy Vehicle Fleet Service</div>
           <h1 style={{ fontSize: 46, maxWidth: 860, lineHeight: 1.15, margin: "16px 0" }}>
             Total Heavy Truck & Fleet Wheel Alignment Services

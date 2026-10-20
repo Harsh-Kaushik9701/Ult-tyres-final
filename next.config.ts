@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
   // Images are served as-is from /public (already optimised .webp files); this
   // also means no external image service is needed when testing offline.
   images: { unoptimized: true },
+  async redirects() {
+    // Careers now lives on the contact page.
+    return [{ source: "/careers", destination: "/contact?topic=careers", permanent: true }];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

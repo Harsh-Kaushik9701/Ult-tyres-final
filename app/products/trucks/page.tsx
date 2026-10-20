@@ -21,7 +21,7 @@ export default async function TrucksPage() {
 
   return (
     <>
-      <PageHero
+      <PageHero backdrop="trucks"
         eyebrow="Heavy Vehicle Freight · Truck Tyres"
         title="Commercial Truck Tyres for the Miles Ahead."
         intro="Browse high-performance radial patterns engineered for Australian interstate linehaul, regional logistics, and severe on/off road conditions across Ralson, Blacklion, and Triangle."

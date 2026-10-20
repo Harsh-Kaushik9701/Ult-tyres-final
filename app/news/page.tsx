@@ -32,7 +32,7 @@ export default function NewsPage() {
           }
         ]}
       />
-      <PageHero
+      <PageHero backdrop="tread"
         crumb="Insights"
         eyebrow="Fleet Insights · Thought Leadership"
         title="Fleet Know-How for the Road Ahead."

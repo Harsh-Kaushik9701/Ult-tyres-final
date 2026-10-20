@@ -86,6 +86,21 @@ The browser downloads only one video. It starts after the page has loaded, pause
 
 To rebuild with new clips (needs ffmpeg with libx264 and libsvtav1): `python3 scripts/build-hero-reel.py <folder with UT01–UT04.mp4 and ut2.mp4> public/videos`. Clip timings and crops are at the top of the script.
 
+## Page header backgrounds
+
+Every inner page header plays a short silent loop of matching footage, with animated accents on top (a rolling tread strip, a turning tyre ring and a red light sweep, all CSS-only and switched off for reduced motion):
+
+| Theme | Footage | Pages |
+| --- | --- | --- |
+| `truck` | Branded service truck | Contact, Find a Branch |
+| `van` | UT mobile service van | About |
+| `fitting` | Tyre fitting machines | Fleet Services, each service page |
+| `trucks` | Prime movers, fitter at work | Wheel Alignment, Truck/Bus tyres, Dealer Login |
+| `shop` | Tyre racks, Ralson tread | Products, brands, tyre detail, Become a Dealer |
+| `tread` | Tread close-up, fitter | Insights and articles |
+
+Change a page's footage with the `backdrop` prop on `<PageHero>`. Files are in `public/videos/backdrops/` (Full HD AV1 + H.264, 960×540 for phones, plus a poster). Rebuild them with `python3 scripts/build-page-backdrops.py <clips folder> public/videos/backdrops`, then bump `BACKDROP_VERSION` in `lib/backdrops.ts`.
+
 ## SEO
 
 - Per-page meta title, description, keywords, canonical URL, Open Graph (`og:title`, `og:description`, `og:url`, `og:image`) and Twitter card tags via `buildMetadata()` in `lib/seo.ts`.

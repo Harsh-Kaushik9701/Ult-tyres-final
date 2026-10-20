@@ -11,7 +11,23 @@ import Link from "next/link";
 import { services } from "@/lib/content";
 import { siteConfig, telHref, whatsappHref } from "@/lib/site-config";
 import { branchAddress, branches, directionsUrl } from "@/lib/branches";
-import { HeaderNav, HeroCarousel as HeroCarouselClient, type HeroBanner, type NavEntry } from "@/components/site-client";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+  LocationIcon,
+  PhoneIcon,
+  WhatsAppIcon
+} from "@/components/icons";
+import {
+  BackgroundVideo,
+  HeaderNav,
+  HeroCarousel as HeroCarouselClient,
+  type HeroBanner,
+  type NavEntry
+} from "@/components/site-client";
+import { videoSources } from "@/lib/video";
+import { backdropFiles, BACKDROP_VERSION, type BackdropTheme } from "@/lib/backdrops";
 
 export { LeadForm } from "@/components/site-client";
 
@@ -31,13 +47,29 @@ export function BrandMark({ priority = false }: { priority?: boolean }) {
   );
 }
 
+export function SocialLinks({ className = "social-links" }: { className?: string }) {
+  return (
+    <div className={className}>
+      <a href={siteConfig.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Ultimate Tyres on LinkedIn">
+        <LinkedInIcon />
+      </a>
+      <a href={siteConfig.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Ultimate Tyres on Facebook">
+        <FacebookIcon />
+      </a>
+      <a href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Ultimate Tyres on Instagram">
+        <InstagramIcon />
+      </a>
+    </div>
+  );
+}
+
 export function TopUtilityRibbon() {
   return (
     <div className="top-utility-ribbon">
       <div className="container top-utility-inner">
         <div className="top-utility-left">
           <a href={telHref()} className="utility-item">
-            <span className="utility-icon" aria-hidden="true">📞</span>
+            <PhoneIcon className="utility-icon" />
             <span>
               Toll-Free: <strong>{phone}</strong>
             </span>
@@ -49,9 +81,9 @@ export function TopUtilityRibbon() {
             rel="noopener noreferrer"
             className="utility-item utility-wa"
           >
-            <span className="wa-dot" aria-hidden="true" />
+            <WhatsAppIcon className="utility-icon" />
             <span>
-              WhatsApp Direct: <strong>{waDisplay}</strong>
+              WhatsApp: <strong>{waDisplay}</strong>
             </span>
           </a>
           <span className="utility-divider" aria-hidden="true">|</span>
@@ -60,18 +92,11 @@ export function TopUtilityRibbon() {
 
         <div className="top-utility-right">
           <Link href="/network" className="utility-link">
-            <span>📍 Find a Branch</span>
+            <LocationIcon className="utility-icon" />
+            <span>Find a Branch</span>
           </Link>
           <span className="utility-divider" aria-hidden="true">|</span>
-          <Link href="/dealers/login" className="utility-link utility-highlight">
-            <span>🔑 Client Portal / Dealer Login</span>
-          </Link>
-          <span className="utility-divider" aria-hidden="true">|</span>
-          <div className="utility-socials">
-            <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="Ultimate Tyres on LinkedIn">IN</a>
-            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Ultimate Tyres on Facebook">FB</a>
-            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Ultimate Tyres on Instagram">IG</a>
-          </div>
+          <SocialLinks className="utility-socials" />
         </div>
       </div>
     </div>
@@ -123,8 +148,7 @@ const navEntries: NavEntry[] = [
   },
   { href: "/news", label: "Insights" },
   { href: "/network", label: "Find a Branch" },
-  { href: "/contact", label: "Contact" },
-  { href: "/careers", label: "Join Us" }
+  { href: "/contact", label: "Contact" }
 ];
 
 export function Header() {
@@ -168,6 +192,7 @@ export function Footer() {
                 Chat on WhatsApp with Fleet Support
               </a>
             </div>
+            <SocialLinks className="social-links footer-socials" />
           </div>
 
           <div>
@@ -201,13 +226,15 @@ export function Footer() {
           <div>
             <h2 className="footer-heading">Our Branches</h2>
             <div className="footer-links">
-              <a href={telHref()}>Toll-Free · {phone}</a>
-              <a href={whatsappHref()} target="_blank" rel="noopener noreferrer">
-                WhatsApp · {waDisplay}
+              <a href={telHref()} className="footer-icon-link">
+                <PhoneIcon /> Toll-Free · {phone}
+              </a>
+              <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="footer-icon-link">
+                <WhatsAppIcon /> WhatsApp · {waDisplay}
               </a>
               {branches.map((b) => (
-                <a key={b.id} href={directionsUrl(b)} target="_blank" rel="noopener noreferrer">
-                  {b.name}
+                <a key={b.id} href={directionsUrl(b)} target="_blank" rel="noopener noreferrer" className="footer-icon-link">
+                  <LocationIcon /> {b.name}
                   {b.note ? ` (${b.note.toLowerCase()})` : ""} · {branchAddress(b)}
                 </a>
               ))}
@@ -215,8 +242,7 @@ export function Footer() {
               <Link href="/network">Find a Branch</Link>
               <Link href="/dealers/login">Wholesale Dealer Portal</Link>
               <Link href="/dealers/apply">Become a Dealer</Link>
-              <Link href="/contact">Contact Our Team</Link>
-              <Link href="/careers">Careers & Join Us</Link>
+              <Link href="/contact">Contact & Careers</Link>
             </div>
           </div>
         </div>
@@ -240,16 +266,16 @@ export function WhatsApp() {
         rel="noopener noreferrer"
         aria-label="Chat directly with Ultimate Tyres Fleet Support on WhatsApp"
       >
-        <span className="wa-pulse-dot" aria-hidden="true" />
-        <span className="wa-fab-text">WhatsApp Fleet Direct</span>
+        <WhatsAppIcon className="wa-fab-icon" />
+        <span className="wa-fab-text">WhatsApp Us</span>
       </a>
 
       <div className="mobile-bottom">
         <a href={telHref()} className="mobile-bottom-btn">
-          📞 Call {phone}
+          <PhoneIcon /> Call {phone}
         </a>
         <Link href="/dealers/login" className="mobile-bottom-btn mobile-bottom-portal">
-          🔑 Dealer Portal
+          Dealer Portal
         </Link>
       </div>
     </>
@@ -258,12 +284,29 @@ export function WhatsApp() {
 
 export type Crumb = { name: string; path?: string };
 
+/** Video background + animated accents shared by every page header. */
+export function PageBackdrop({ theme }: { theme: BackdropTheme }) {
+  const f = backdropFiles(theme);
+  return (
+    <>
+      <BackgroundVideo sources={videoSources(f.base, f.mobileBase, BACKDROP_VERSION)} poster={f.poster} />
+      <div className="page-hero-shade" aria-hidden="true" />
+      <div className="page-hero-fx" aria-hidden="true">
+        <span className="fx-tread" />
+        <span className="fx-scan" />
+        <span className="fx-rings" />
+      </div>
+    </>
+  );
+}
+
 export function PageHero({
   eyebrow,
   title,
   intro,
   crumb,
-  trail
+  trail,
+  backdrop = "truck"
 }: {
   eyebrow: string;
   title: string;
@@ -272,10 +315,13 @@ export function PageHero({
   crumb?: string;
   /** Intermediate breadcrumb links between Home and the current page. */
   trail?: Crumb[];
+  /** Which background video plays behind the header. */
+  backdrop?: BackdropTheme;
 }) {
   return (
-    <section className="page-hero">
-      <div className="container">
+    <section className="page-hero has-backdrop">
+      <PageBackdrop theme={backdrop} />
+      <div className="container page-hero-inner">
         <div className="eyebrow">{eyebrow}</div>
         <h1>{title}</h1>
         <p>{intro}</p>

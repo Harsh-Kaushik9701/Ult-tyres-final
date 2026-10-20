@@ -17,7 +17,7 @@ export const metadata: Metadata = buildMetadata({
 export default function DealerLoginPage() {
   return (
     <>
-      <PageHero
+      <PageHero backdrop="trucks"
         eyebrow="Commercial Fleet Network · Dealer Portal"
         title="Authorised Wholesale Portal."
         intro="Access live warehouse stock, wholesale trade pricing, rapid SKU ordering, and order tracking for Ralson, Blacklion, and Triangle commercial radials."
