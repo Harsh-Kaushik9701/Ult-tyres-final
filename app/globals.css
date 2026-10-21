@@ -782,3 +782,52 @@ th { background:#f7f7f7; font-size:9.5px; text-transform:uppercase; letter-spaci
   .fx-scan { display:none; }
 }
 .hero-image img { transition:opacity .3s, transform .3s; }
+
+/* ---- Tyre-position guide (components/truck-position-guide.tsx) ---- */
+.tpg { background:#f8faf9; }
+.tpg-figure { background:linear-gradient(180deg, #eef2f4 0%, #ffffff 100%); border:1px solid var(--line); border-radius:14px; padding:clamp(12px, 3vw, 28px); margin-bottom:22px; }
+.tpg-truck { display:block; width:100%; height:auto; max-height:380px; }
+.tpg-ground { stroke:#c7ced3; stroke-width:2; }
+.tpg-shadow { fill:rgba(0,0,0,.08); }
+.tpg-chassis { fill:#22282a; }
+.tpg-fifth { fill:#3a4245; }
+.tpg-fifth-top { fill:#1a1f20; }
+.tpg-tank { fill:#cfd6da; stroke:#9aa5ab; stroke-width:2; }
+.tpg-tank-line { stroke:#9aa5ab; stroke-width:2; }
+.tpg-guard { fill:none; stroke:#22282a; stroke-width:8; stroke-linecap:round; }
+.tpg-cab { fill:#ffffff; stroke:#b9c2c7; stroke-width:2; }
+.tpg-roof { fill:#f3f5f6; stroke:#b9c2c7; stroke-width:2; }
+.tpg-glass { fill:#1c2224; }
+.tpg-line { fill:none; stroke:#b9c2c7; stroke-width:2; }
+.tpg-handle, .tpg-step, .tpg-mirror { fill:#3a4245; }
+.tpg-stripe { fill:var(--red); }
+.tpg-grille { fill:#1c2224; }
+.tpg-light { fill:#fde68a; }
+.tpg-bumper { fill:#d9dfe2; stroke:#9aa5ab; stroke-width:2; }
+.tpg-tyre { fill:#161a1b; }
+.tpg-tread { fill:none; stroke:#3a4245; stroke-width:6; stroke-dasharray:6 6; transform-box:fill-box; transform-origin:center; animation:tpgRoll 3s linear infinite; }
+.tpg-rim { fill:#c9d0d4; stroke:#8e999f; stroke-width:2; }
+.tpg-hub { fill:#6b767c; }
+@keyframes tpgRoll { to { transform:rotate(360deg); } }
+.tpg-marker line, .tpg-marker path { fill:none; stroke:var(--red); stroke-width:2; stroke-dasharray:5 5; }
+.tpg-marker circle { fill:var(--red); stroke:#fff; stroke-width:3; transform-box:fill-box; transform-origin:center; animation:tpgPulse 2.4s ease-in-out infinite; }
+.tpg-marker text { fill:#fff; font:800 17px var(--body); text-anchor:middle; }
+.tpg-marker-muted circle { fill:#22282a; }
+.tpg-marker-muted line, .tpg-marker-muted path { stroke:#22282a; }
+@keyframes tpgPulse { 0%, 100% { transform:scale(1); } 50% { transform:scale(1.12); } }
+.tpg-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:18px; }
+.tpg-card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:24px; }
+.tpg-card-head { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+.tpg-card-head h3 { margin:0; font-size:22px; color:var(--ink); }
+.tpg-badge { display:inline-grid; place-items:center; width:32px; height:32px; border-radius:50%; background:var(--red); color:#fff; font-weight:800; flex-shrink:0; }
+.tpg-card:last-child .tpg-badge { background:#22282a; }
+.tpg-card p { color:var(--muted); font-size:14px; line-height:1.6; margin:0 0 14px; }
+.tpg-patterns { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+.tpg-patterns a { display:inline-block; padding:6px 10px; border:1px solid var(--line); border-radius:999px; font-size:12px; font-weight:700; color:var(--ink); background:#f8faf9; transition:border-color .15s, color .15s; }
+.tpg-patterns a:hover { border-color:var(--red); color:var(--red); }
+@media (prefers-reduced-motion: reduce) { .tpg-tread, .tpg-marker circle { animation:none; } }
+.tpg-rim-inner { fill:#e3e8ea; stroke:#8e999f; stroke-width:1.5; }
+.tpg-taillight { fill:var(--red); }
+.tpg-line-soft { fill:none; stroke:#dde3e6; stroke-width:2; }
+.tpg-fifth-top { fill:none; stroke:#1a1f20; stroke-width:4; }
+.tpg-marker text.tpg-caption { fill:#526064; font:700 12px var(--body); text-transform:uppercase; letter-spacing:.08em; }

@@ -4,6 +4,7 @@ import { ProductCatalog } from "@/components/catalog";
 import { PageHero } from "@/components/site";
 import { getPublicProducts } from "@/lib/products";
 import Link from "next/link";
+import { TruckPositionGuide } from "@/components/truck-position-guide";
 
 export const metadata: Metadata = buildMetadata({
   title: "Commercial Truck Tyres – Line Haul, Regional & On/Off Road",
@@ -27,6 +28,7 @@ export default async function TrucksPage() {
         intro="Browse high-performance radial patterns engineered for Australian interstate linehaul, regional logistics, and severe on/off road conditions across Ralson, Blacklion, and Triangle."
         crumb="Truck tyres"
       />
+      <TruckPositionGuide />
       <section className="section">
         <div className="container">
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 26, alignItems: "center" }}>
